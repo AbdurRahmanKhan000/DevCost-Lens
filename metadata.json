@@ -1,0 +1,6 @@
+{
+  "name": "DevCost Lens",
+  "description": "Smart electricity meter for AI: monitor real-time AI spending, token consumption, and smarter alternatives across 15+ models.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
