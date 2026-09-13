@@ -392,66 +392,8 @@ export const AdminPanelPage: React.FC<AdminPanelPageProps> = ({
           </div>
 
           <form onSubmit={handleSaveGateways} className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6">
               {/* Card donation configuration */}
-              <Card className="p-6 border-zinc-800 bg-zinc-900/60">
-                <div className="flex items-center gap-2.5 pb-4 border-b border-zinc-800">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                    <Smartphone className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-base font-mono">Donation Card Settings</CardTitle>
-                    <CardDescription className="text-xs">Private card destination for optional donations</CardDescription>
-                  </div>
-                </div>
-
-                <div className="space-y-4 mt-5 font-mono text-xs">
-                  <div>
-                    <label className="block text-zinc-300 font-semibold mb-1">
-                      Donation card number (admin only)
-                    </label>
-                    <Input
-                      type="text"
-                      value={easypaisaNumber}
-                      onChange={(e) => setEasypaisaNumber(e.target.value)}
-                      placeholder="Enter the card number used to receive donations"
-                      className="bg-zinc-950 border-zinc-800 font-mono text-sm text-cyan-300"
-                      required
-                    />
-                    <span className="text-[10px] text-zinc-500 mt-1 block">
-                      Stored encrypted with AES-256-GCM. This value is never shown to regular users.
-                    </span>
-                  </div>
-
-                  <div>
-                    <label className="block text-zinc-300 font-semibold mb-1">
-                      Account Title / Name
-                    </label>
-                    <Input
-                      type="text"
-                      value={easypaisaTitle}
-                      onChange={(e) => setEasypaisaTitle(e.target.value)}
-                      placeholder="e.g. Abdur Rahman Khan"
-                      className="bg-zinc-950 border-zinc-800 font-mono text-xs"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-zinc-300 font-semibold mb-1">
-                      Payment Instructions for User
-                    </label>
-                    <textarea
-                      rows={3}
-                      value={easypaisaInstructions}
-                      onChange={(e) => setEasypaisaInstructions(e.target.value)}
-                      className="w-full px-3 py-2 text-xs font-mono rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-200 focus:outline-none focus:border-cyan-500"
-                    />
-                  </div>
-                </div>
-              </Card>
-
-              {/* MasterCard Configuration */}
               <Card className="p-6 border-zinc-800 bg-zinc-900/60">
                 <div className="flex items-center gap-2.5 pb-4 border-b border-zinc-800">
                   <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">

@@ -188,8 +188,8 @@ app.get("/api/health", (req: Request, res: Response) => {
   res.json({
     status: "ok",
     app: "DevCost Lens",
-    phase: 3,
-    features: ["monetization", "admin_panel", "aes_gcm_security", "realtime_telemetry", "key_examination"],
+    phase: 4,
+    features: ["free_unlimited_apis", "optional_card_donations", "admin_panel", "aes_gcm_security", "realtime_telemetry", "key_examination"],
   });
 });
 
@@ -390,9 +390,28 @@ app.post("/api/keys/examine", async (req: Request, res: Response) => {
 });
 
 /**
+ * GET /api/donation/card
+ * Public donation instructions. Only the founder's configured card destination
+ * is returned; admin settings and unrelated payment credentials stay private.
+ */
+app.get("/api/donation/card", (_req: Request, res: Response) => {
+  const cardNumber = decryptAESGCM(activeEncryptedSettings.mastercardNumber).trim();
+  const cardholder = decryptAESGCM(activeEncryptedSettings.mastercardHolder).trim();
+
+  res.json({
+    isConfigured: Boolean(cardNumber),
+    cardNumber: cardNumber || null,
+    cardholder: cardholder || null,
+    bankName: activeEncryptedSettings.mastercardBankName,
+    instructions: cardNumber
+      ? activeEncryptedSettings.mastercardInstructions
+      : "The founder is still adding the receiving card number. Please check back soon.",
+  });
+});
+
+/**
  * GET /api/payment/instructions
- * Fetches decrypted payment credentials directly from backend.
- * Phone number and Card number are NEVER included in client bundles!
+ * Legacy payment instructions endpoint retained for compatibility.
  */
 app.get("/api/payment/instructions", (req: Request, res: Response) => {
   const method = (req.query.method as string || "easypaisa").toLowerCase();

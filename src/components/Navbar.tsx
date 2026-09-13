@@ -189,9 +189,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span>Spend Dashboard</span>
             </button>
             <button
-              onClick={() => handleNavClick("plans")}
+              onClick={() => handleNavClick("donation")}
               className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
-                currentView === "plans"
+                currentView === "donation"
                   ? "text-amber-400 font-semibold"
                   : "text-zinc-400 hover:text-amber-300"
               }`}
@@ -357,7 +357,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             ⚡ Spend Dashboard
           </button>
           <button
-            onClick={() => handleNavClick("plans")}
+            onClick={() => handleNavClick("donation")}
             className="block w-full text-left py-2 text-amber-400 hover:text-amber-300 font-semibold"
           >
             💎 Support the Project
