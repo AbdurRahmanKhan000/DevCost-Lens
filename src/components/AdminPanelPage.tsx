@@ -54,7 +54,7 @@ export const AdminPanelPage: React.FC<AdminPanelPageProps> = ({
   const [easypaisaNumber, setEasypaisaNumber] = useState("0332-9118144");
   const [easypaisaTitle, setEasypaisaTitle] = useState("Abdur Rahman Khan");
   const [easypaisaInstructions, setEasypaisaInstructions] = useState(
-    "1. Open EasyPaisa app -> Tap 'Send Money' -> Enter 0332-9118144.\n2. Transfer the exact PKR amount.\n3. Enter the 11-digit Transaction ID (TRX ID) from your SMS or app below for instant verification."
+    "Enter the card destination details in the secure fields below.\nOnly the authorized founder can view or update these settings."
   );
   // Empty space for card number as requested: Admin will insert their card number here
   const [mastercardNumber, setMastercardNumber] = useState("");
@@ -161,7 +161,7 @@ export const AdminPanelPage: React.FC<AdminPanelPageProps> = ({
       await processVerificationAction(id, action, adminEmail);
       setToastMessage({
         type: "success",
-        text: action === "approve" ? "User upgraded to Pro!" : "Payment rejected.",
+        text: action === "approve" ? "Donation request approved." : "Donation request rejected.",
       });
       loadVerifications();
       setTimeout(() => setToastMessage(null), 3500);
@@ -187,13 +187,13 @@ export const AdminPanelPage: React.FC<AdminPanelPageProps> = ({
       await adminDirectUpgradeUser(manualEmail, manualClerkId, manualPlan, adminEmail);
       setToastMessage({
         type: "success",
-        text: `User ${manualEmail || manualClerkId} manually upgraded to Pro with Unlimited Keys!`,
+        text: `User ${manualEmail || manualClerkId} received founder approval.`,
       });
       setManualEmail("");
       setManualClerkId("");
       setTimeout(() => setToastMessage(null), 4000);
     } catch (err: any) {
-      setToastMessage({ type: "error", text: err.message || "Failed to upgrade user." });
+      setToastMessage({ type: "error", text: err.message || "Failed to update the user record." });
     } finally {
       setIsUpgradingManual(false);
     }
@@ -220,21 +220,11 @@ export const AdminPanelPage: React.FC<AdminPanelPageProps> = ({
             ))}
           </div>
 
-          <div className="mt-6 flex justify-center gap-3">
-            <Button variant="outline" onClick={onBackToDashboard} className="font-mono text-xs">
-              Return to Dashboard
-            </Button>
-            <Button
-              onClick={() => {
-                // Enable admin preview mode for owner
-                localStorage.setItem("devcost_admin_email", "arkmfk27@gmail.com");
-                window.location.reload();
-              }}
-              className="font-mono text-xs bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-bold"
-            >
-              Verify as arkmfk27@gmail.com
-            </Button>
-          </div>
+            <div className="mt-6 flex justify-center">
+              <Button variant="outline" onClick={onBackToDashboard} className="font-mono text-xs">
+                Return to Dashboard
+              </Button>
+            </div>
         </Card>
       </div>
     );
@@ -261,7 +251,7 @@ export const AdminPanelPage: React.FC<AdminPanelPageProps> = ({
             </Badge>
           </div>
           <p className="text-xs text-zinc-400 mt-1 max-w-2xl font-mono">
-            Signed in as <strong>{adminEmail}</strong>. Manage your hidden EasyPaisa & MasterCard payment instructions with <strong>AES-GCM encryption</strong> and manually verify user upgrade requests.
+            Signed in as <strong>{adminEmail}</strong>. Manage the private donation-card details with <strong>AES-GCM encryption</strong>. These controls are available only to the authorized founder account.
           </p>
         </div>
 
@@ -272,7 +262,7 @@ export const AdminPanelPage: React.FC<AdminPanelPageProps> = ({
             onClick={onNavigateToPricing}
             className="text-xs font-mono border-zinc-700 hover:text-white"
           >
-            <span>View Public /pricing Page →</span>
+            <span>View Donation Page →</span>
           </Button>
           <Button
             variant="default"
@@ -315,7 +305,7 @@ export const AdminPanelPage: React.FC<AdminPanelPageProps> = ({
           <div className="mt-2 text-2xl sm:text-3xl font-extrabold font-mono text-emerald-400">
             ${totalVerifiedRevenue.toFixed(2)}
           </div>
-          <div className="text-[10px] font-mono text-zinc-500 mt-1">EasyPaisa & MasterCard combined</div>
+          <div className="text-[10px] font-mono text-zinc-500 mt-1">Optional card donations</div>
         </Card>
 
         <Card className="p-4 border-zinc-800 bg-zinc-900/60">
@@ -327,11 +317,11 @@ export const AdminPanelPage: React.FC<AdminPanelPageProps> = ({
         </Card>
 
         <Card className="p-4 border-zinc-800 bg-zinc-900/60">
-          <div className="text-[11px] font-mono text-zinc-400 uppercase">Active Pro Upgrades</div>
+          <div className="text-[11px] font-mono text-zinc-400 uppercase">Supported Users</div>
           <div className="mt-2 text-2xl sm:text-3xl font-extrabold font-mono text-cyan-400">
             {approvedCount}
           </div>
-          <div className="text-[10px] font-mono text-zinc-500 mt-1">Unlimited keys active</div>
+          <div className="text-[10px] font-mono text-zinc-500 mt-1">Donation records tracked</div>
         </Card>
 
         <Card className="p-4 border-zinc-800 bg-zinc-900/60">
@@ -396,79 +386,21 @@ export const AdminPanelPage: React.FC<AdminPanelPageProps> = ({
             <div>
               <div className="font-bold text-white">Sensitive Credential Vault (AES-GCM Protected)</div>
               <p className="text-zinc-300 mt-1 leading-relaxed">
-                Your EasyPaisa phone number and MasterCard number are <strong>never stored in plaintext</strong> and <strong>never exposed in the client frontend bundle</strong>. When a user clicks "Pay via EasyPaisa" or "Card", the backend decrypts these values in a secure server-side execution context.
+                Your donation card number is <strong>never stored in plaintext</strong> and <strong>never exposed to regular users</strong>. The backend decrypts it only for authorized administrative operations.
               </p>
             </div>
           </div>
 
           <form onSubmit={handleSaveGateways} className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* EasyPaisa Configuration */}
-              <Card className="p-6 border-zinc-800 bg-zinc-900/60">
-                <div className="flex items-center gap-2.5 pb-4 border-b border-zinc-800">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                    <Smartphone className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-base font-mono">EasyPaisa Gateway Credentials</CardTitle>
-                    <CardDescription className="text-xs">Mobile wallet payment destination</CardDescription>
-                  </div>
-                </div>
-
-                <div className="space-y-4 mt-5 font-mono text-xs">
-                  <div>
-                    <label className="block text-zinc-300 font-semibold mb-1">
-                      EasyPaisa Mobile Phone Number (Required)
-                    </label>
-                    <Input
-                      type="text"
-                      value={easypaisaNumber}
-                      onChange={(e) => setEasypaisaNumber(e.target.value)}
-                      placeholder="03001234567"
-                      className="bg-zinc-950 border-zinc-800 font-mono text-sm text-cyan-300"
-                      required
-                    />
-                    <span className="text-[10px] text-zinc-500 mt-1 block">
-                      Stored encrypted with AES-256-GCM. Users only see this after selecting EasyPaisa.
-                    </span>
-                  </div>
-
-                  <div>
-                    <label className="block text-zinc-300 font-semibold mb-1">
-                      Account Title / Name
-                    </label>
-                    <Input
-                      type="text"
-                      value={easypaisaTitle}
-                      onChange={(e) => setEasypaisaTitle(e.target.value)}
-                      placeholder="e.g. Abdur Rahman Khan"
-                      className="bg-zinc-950 border-zinc-800 font-mono text-xs"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-zinc-300 font-semibold mb-1">
-                      Payment Instructions for User
-                    </label>
-                    <textarea
-                      rows={3}
-                      value={easypaisaInstructions}
-                      onChange={(e) => setEasypaisaInstructions(e.target.value)}
-                      className="w-full px-3 py-2 text-xs font-mono rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-200 focus:outline-none focus:border-cyan-500"
-                    />
-                  </div>
-                </div>
-              </Card>
-
-              {/* MasterCard Configuration */}
+            <div className="grid grid-cols-1 gap-6">
+              {/* Card donation configuration */}
               <Card className="p-6 border-zinc-800 bg-zinc-900/60">
                 <div className="flex items-center gap-2.5 pb-4 border-b border-zinc-800">
                   <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
                     <CreditCard className="w-4 h-4" />
                   </div>
                   <div>
-                    <CardTitle className="text-base font-mono">MasterCard / Bank Account</CardTitle>
+                    <CardTitle className="text-base font-mono">Donation Card Destination</CardTitle>
                     <CardDescription className="text-xs">Credit/Debit & IBAN destination</CardDescription>
                   </div>
                 </div>
@@ -538,7 +470,7 @@ export const AdminPanelPage: React.FC<AdminPanelPageProps> = ({
 
                   <div>
                     <label className="block text-zinc-300 font-semibold mb-1">
-                      MasterCard Instructions
+                      Card Donation Instructions
                     </label>
                     <textarea
                       rows={2}
@@ -594,7 +526,7 @@ export const AdminPanelPage: React.FC<AdminPanelPageProps> = ({
               <Clock className="w-10 h-10 text-zinc-600 mx-auto mb-3" />
               <div className="text-sm font-bold font-mono text-white">No payment submissions yet</div>
               <p className="text-xs text-zinc-400 mt-1 max-w-sm mx-auto font-mono">
-                When users choose "Pay via EasyPaisa" or "Card" on the pricing page and submit their TRX ID, their payment will appear here for one-click approval.
+                Donation activity will appear here when card-support workflows are connected. DevCost Lens is free for every user; no upgrade approvals are required.
               </p>
             </Card>
           ) : (
@@ -707,7 +639,7 @@ export const AdminPanelPage: React.FC<AdminPanelPageProps> = ({
               <span>Direct Complimentary / Manual Upgrade</span>
             </CardTitle>
             <CardDescription className="text-xs mt-1">
-              Instantly upgrade any developer's account to Pro without requiring a transaction submission.
+              Review founder-only account actions and donation activity.
             </CardDescription>
 
             <form onSubmit={handleManualUpgrade} className="space-y-4 mt-5 font-mono text-xs">

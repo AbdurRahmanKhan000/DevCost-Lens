@@ -1,16 +1,15 @@
 import React from "react";
 import { BrandLogo } from "./BrandLogo";
-import { Github, ExternalLink, ShieldCheck, Heart, Sparkles, Zap, KeyRound } from "lucide-react";
+import { Github, ExternalLink, ShieldCheck, Heart } from "lucide-react";
 import { ActiveView } from "../types";
 import { useUser } from "@clerk/react";
 import { isUserAdmin } from "../lib/admin";
 
 interface FooterProps {
-  onOpenSchemaModal: () => void;
   onNavigate: (view: ActiveView) => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onOpenSchemaModal, onNavigate }) => {
+export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   const { user } = useUser();
   const isAdmin = isUserAdmin(user);
 
@@ -62,34 +61,22 @@ export const Footer: React.FC<FooterProps> = ({ onOpenSchemaModal, onNavigate })
               </li>
               <li>
                 <button
-                  onClick={() => onNavigate("plans")}
+                  onClick={() => onNavigate("donation")}
                   className="text-amber-400 hover:text-amber-300 font-semibold transition-colors cursor-pointer"
                 >
-                  💎 Premium Plans
+                  <span className="inline-flex items-center gap-1.5"><Heart className="w-3.5 h-3.5" /> Support the Project</span>
                 </button>
               </li>
-              {/* Only visible to arkmfk27@gmail.com and abdurrehman200khan@gmail.com */}
               {isAdmin && (
-                <>
-                  <li>
-                    <button
-                      onClick={() => onNavigate("admin")}
-                      className="text-cyan-400 hover:underline cursor-pointer flex items-center gap-1 text-[11px] font-bold"
-                    >
-                      <ShieldCheck className="w-3 h-3 text-cyan-400" />
-                      <span>Admin Command Panel</span>
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      onClick={onOpenSchemaModal}
-                      className="text-zinc-400 hover:text-cyan-400 cursor-pointer flex items-center gap-1 text-[11px]"
-                    >
-                      <span>Supabase & Vercel Guide</span>
-                      <span className="text-[9px] px-1 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">Admin</span>
-                    </button>
-                  </li>
-                </>
+                <li>
+                  <button
+                    onClick={() => onNavigate("admin")}
+                    className="text-cyan-400 hover:underline cursor-pointer flex items-center gap-1 text-[11px] font-bold"
+                  >
+                    <ShieldCheck className="w-3 h-3 text-cyan-400" />
+                    <span>Admin Command Panel</span>
+                  </button>
+                </li>
               )}
             </ul>
           </div>

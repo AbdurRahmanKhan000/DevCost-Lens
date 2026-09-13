@@ -5,28 +5,28 @@
  * Author: Abdur Rahman Khan
  */
 
-import React, { useState, useEffect } from "react";
+import React, { lazy, Suspense, useState, useEffect } from "react";
 import { Navbar } from "./components/Navbar";
-import { HeroSection } from "./components/HeroSection";
-import { FeaturesSection } from "./components/FeaturesSection";
-import { ModelPricingGrid } from "./components/ModelPricingGrid";
-import { AuthorSection } from "./components/AuthorSection";
 import { Footer } from "./components/Footer";
-import { LoginPage } from "./components/LoginPage";
-import { SignupPage } from "./components/SignupPage";
-import { ApisVaultPage } from "./components/ApisVaultPage";
-import { TokenCounterPage } from "./components/TokenCounterPage";
-import { DashboardPage } from "./components/DashboardPage";
-import { PricingPlansPage } from "./components/PricingPlansPage";
-import { AdminPanelPage } from "./components/AdminPanelPage";
-import { PhaseRoadmapModal } from "./components/PhaseRoadmapModal";
+const HeroSection = lazy(() => import("./components/HeroSection").then((module) => ({ default: module.HeroSection })));
+const FeaturesSection = lazy(() => import("./components/FeaturesSection").then((module) => ({ default: module.FeaturesSection })));
+const AuthorSection = lazy(() => import("./components/AuthorSection").then((module) => ({ default: module.AuthorSection })));
+
+const ModelPricingGrid = lazy(() => import("./components/ModelPricingGrid").then((module) => ({ default: module.ModelPricingGrid })));
+const LoginPage = lazy(() => import("./components/LoginPage").then((module) => ({ default: module.LoginPage })));
+const SignupPage = lazy(() => import("./components/SignupPage").then((module) => ({ default: module.SignupPage })));
+const ApisVaultPage = lazy(() => import("./components/ApisVaultPage").then((module) => ({ default: module.ApisVaultPage })));
+const TokenCounterPage = lazy(() => import("./components/TokenCounterPage").then((module) => ({ default: module.TokenCounterPage })));
+const DashboardPage = lazy(() => import("./components/DashboardPage").then((module) => ({ default: module.DashboardPage })));
+const DonationPage = lazy(() => import("./components/DonationPage").then((module) => ({ default: module.DonationPage })));
+const AdminPanelPage = lazy(() => import("./components/AdminPanelPage").then((module) => ({ default: module.AdminPanelPage })));
+
 import { ActiveView, ThemeMode } from "./types";
 import { useUser } from "@clerk/react";
 
 export default function App() {
   const [currentView, setCurrentView] = useState<ActiveView>("landing");
   const [theme, setTheme] = useState<ThemeMode>("dark");
-  const [isSchemaModalOpen, setIsSchemaModalOpen] = useState<boolean>(false);
   const { user } = useUser();
 
   // URL hash / pathname synchronization
@@ -37,8 +37,8 @@ export default function App() {
 
       if (path === "/admin" || hash === "admin") {
         setCurrentView("admin");
-      } else if (path === "/pricing" || hash === "pricing" || hash === "plans") {
-        setCurrentView("plans");
+      } else if (path === "/donate" || hash === "donate") {
+        setCurrentView("donation");
       } else if (path === "/apis" || hash === "apis") {
         setCurrentView("apis");
       } else if (path === "/dashboard" || hash === "dashboard") {
@@ -81,17 +81,17 @@ export default function App() {
         setCurrentView={setCurrentView}
         theme={theme}
         toggleTheme={toggleTheme}
-        onOpenSchemaModal={() => setIsSchemaModalOpen(true)}
       />
 
       {/* Main Content Area based on Active View */}
       <main className="flex-1">
+        <Suspense fallback={<div className="min-h-[40vh] grid place-items-center text-sm font-mono text-zinc-500" role="status">Loading DevCost Lens…</div>}>
         {currentView === "landing" && (
           <>
             <HeroSection
               onGetStarted={() => setCurrentView("apis")}
               onPromptCheck={() => setCurrentView("token-counter")}
-              onExplorePricing={() => setCurrentView("plans")}
+              onExplorePricing={() => setCurrentView("donation")}
             />
             <ModelPricingGrid />
             <FeaturesSection />
@@ -103,15 +103,14 @@ export default function App() {
           <DashboardPage
             onNavigateToApis={() => setCurrentView("apis")}
             onNavigateToTokenCounter={() => setCurrentView("token-counter")}
-            onOpenSchemaModal={() => setIsSchemaModalOpen(true)}
-          />
+              />
         )}
 
         {currentView === "apis" && (
           <ApisVaultPage
             onNavigateToDashboard={() => setCurrentView("dashboard")}
             onNavigateToTokenCounter={() => setCurrentView("token-counter")}
-            onNavigateToPricing={() => setCurrentView("plans")}
+            onNavigateToPricing={() => setCurrentView("donation")}
           />
         )}
 
@@ -121,17 +120,14 @@ export default function App() {
           />
         )}
 
-        {currentView === "plans" && (
-          <PricingPlansPage
-            onNavigateToVault={() => setCurrentView("apis")}
-            onNavigateToDashboard={() => setCurrentView("dashboard")}
-          />
+        {currentView === "donation" && (
+          <DonationPage onContinue={() => setCurrentView("apis")} />
         )}
 
         {currentView === "admin" && (
           <AdminPanelPage
             onBackToDashboard={() => setCurrentView("dashboard")}
-            onNavigateToPricing={() => setCurrentView("plans")}
+            onNavigateToPricing={() => setCurrentView("donation")}
           />
         )}
 
@@ -148,19 +144,14 @@ export default function App() {
             onBackToHome={() => setCurrentView("landing")}
           />
         )}
+        </Suspense>
       </main>
 
       {/* Global Footer with Abdur Rahman Khan intro card & links */}
       <Footer
-        onOpenSchemaModal={() => setIsSchemaModalOpen(true)}
         onNavigate={(view) => setCurrentView(view)}
       />
 
-      {/* Phase 2 Handover & Supabase/Clerk Environment Modal */}
-      <PhaseRoadmapModal
-        isOpen={isSchemaModalOpen}
-        onClose={() => setIsSchemaModalOpen(false)}
-      />
     </div>
   );
 }
