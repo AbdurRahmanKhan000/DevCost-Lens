@@ -1,0 +1,26 @@
+{
+  "easypaisaNumber": {
+    "ciphertext": "b/1IRHTmB/YZhlUM",
+    "iv": "ixBIEJxF4GIP8kBI",
+    "tag": "8c+sKg2c4mA3uS6mp+rmLQ=="
+  },
+  "easypaisaTitle": {
+    "ciphertext": "X2IuMe/UTaq22qPXTfHbUxI=",
+    "iv": "MW891DWhG3nn3G4C",
+    "tag": "ntYuOCABrX/Ln5/bISn20g=="
+  },
+  "easypaisaInstructions": "1. Open EasyPaisa app -> Tap 'Send Money' -> Enter this EasyPaisa number.\n2. Transfer the exact PKR amount.\n3. Enter the 11-digit Transaction ID (TRX ID) from your SMS or app below for instant verification.",
+  "mastercardNumber": {
+    "ciphertext": "",
+    "iv": "6VbIeyXuu4T9Fczx",
+    "tag": "ZmwN4Hr8n997TRS2odlddQ=="
+  },
+  "mastercardHolder": {
+    "ciphertext": "2e7BmPU6nt26HevDT9lLCnw=",
+    "iv": "Pr0gkcO6RhCmTTsm",
+    "tag": "UiVxeMW9w0G6hhKveNxhIQ=="
+  },
+  "mastercardBankName": "Bank / Debit Card",
+  "mastercardInstructions": "Transfer the amount to this Card Number / IBAN. Enter your Transaction Reference ID below for instant activation.",
+  "updatedAt": "2026-09-13T09:53:44.313Z"
+}
