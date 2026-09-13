@@ -68,7 +68,7 @@ export const AuthorSection: React.FC = () => {
               </div>
 
               <p className="mt-4 text-sm text-zinc-200 leading-relaxed">
-                "AI engineering should empower builders to push technological frontiers—not keep them awake at night fearing runaway billing spikes or hidden inference fees. At ARK Technologies, we engineered DevCost Lens to be the definitive mission-control layer for developers: delivering millisecond-accurate electricity telemetry, automated circuit-breakers, and mathematical model-arbitrage, while keeping your private API keys strictly client-encrypted and uncompromised."
+                DevCost Lens was created from a simple belief: developers should be able to explore AI boldly without losing control of their budgets. I built this project to make model costs understandable, usage visible, and smarter choices easier—so independent builders can spend more time creating and less time worrying about surprise bills.
               </p>
 
               {/* Action Links */}

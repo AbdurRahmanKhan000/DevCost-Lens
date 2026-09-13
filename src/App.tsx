@@ -19,14 +19,13 @@ import { TokenCounterPage } from "./components/TokenCounterPage";
 import { DashboardPage } from "./components/DashboardPage";
 import { DonationPage } from "./components/DonationPage";
 import { AdminPanelPage } from "./components/AdminPanelPage";
-import { PhaseRoadmapModal } from "./components/PhaseRoadmapModal";
+
 import { ActiveView, ThemeMode } from "./types";
 import { useUser } from "@clerk/react";
 
 export default function App() {
   const [currentView, setCurrentView] = useState<ActiveView>("landing");
   const [theme, setTheme] = useState<ThemeMode>("dark");
-  const [isSchemaModalOpen, setIsSchemaModalOpen] = useState<boolean>(false);
   const { user } = useUser();
 
   // URL hash / pathname synchronization
@@ -37,7 +36,7 @@ export default function App() {
 
       if (path === "/admin" || hash === "admin") {
         setCurrentView("admin");
-      } else if (path === "/pricing" || path === "/donate" || hash === "pricing" || hash === "plans" || hash === "donate") {
+      } else if (path === "/donate" || hash === "donate") {
         setCurrentView("donation");
       } else if (path === "/apis" || hash === "apis") {
         setCurrentView("apis");
@@ -81,7 +80,6 @@ export default function App() {
         setCurrentView={setCurrentView}
         theme={theme}
         toggleTheme={toggleTheme}
-        onOpenSchemaModal={() => setIsSchemaModalOpen(true)}
       />
 
       {/* Main Content Area based on Active View */}
@@ -103,8 +101,7 @@ export default function App() {
           <DashboardPage
             onNavigateToApis={() => setCurrentView("apis")}
             onNavigateToTokenCounter={() => setCurrentView("token-counter")}
-            onOpenSchemaModal={() => setIsSchemaModalOpen(true)}
-          />
+              />
         )}
 
         {currentView === "apis" && (
@@ -149,15 +146,9 @@ export default function App() {
 
       {/* Global Footer with Abdur Rahman Khan intro card & links */}
       <Footer
-        onOpenSchemaModal={() => setIsSchemaModalOpen(true)}
         onNavigate={(view) => setCurrentView(view)}
       />
 
-      {/* Phase 2 Handover & Supabase/Clerk Environment Modal */}
-      <PhaseRoadmapModal
-        isOpen={isSchemaModalOpen}
-        onClose={() => setIsSchemaModalOpen(false)}
-      />
     </div>
   );
 }
