@@ -110,7 +110,7 @@ export type ActiveView =
   | 'apis'
   | 'token-counter'
   | 'dashboard'
-  | 'plans'
+  | 'donation'
   | 'admin';
 
 export type ThemeMode = 'dark' | 'light';

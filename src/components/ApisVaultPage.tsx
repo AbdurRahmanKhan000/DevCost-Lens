@@ -31,8 +31,6 @@ import {
   saveEncryptedApiKey,
   deleteStoredApiKey,
   addUsageRecord,
-  getUserSubscription,
-  StoredSubscription,
 } from "../lib/supabase";
 import { useUser } from "@clerk/react";
 import { formatCurrency, formatNumber } from "../lib/utils";
@@ -116,9 +114,7 @@ export const ApisVaultPage: React.FC<ApisVaultPageProps> = ({
 }) => {
   const { user } = useUser();
   const [keys, setKeys] = useState<StoredApiKey[]>([]);
-  const [subscription, setSubscription] = useState<StoredSubscription | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
-  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState<boolean>(false);
 
   // Form State
   const [selectedProvider, setSelectedProvider] = useState<AIProvider>("openai");
@@ -139,12 +135,8 @@ export const ApisVaultPage: React.FC<ApisVaultPageProps> = ({
     const loaded = getStoredApiKeys();
     setKeys(loaded);
 
-    getUserSubscription(user?.id, user?.primaryEmailAddress?.emailAddress).then(setSubscription);
   }, [user]);
 
-  // Max allowed APIs: 2 for Free, unlimited (999999) for Pro
-  const isPro = subscription?.status === "active" && subscription.planId.startsWith("pro");
-  const maxAllowedKeys = isPro ? 999999 : (subscription?.maxApis || 2);
 
   // Continuous live simulation ticker: keeps ticking tokens and cost continuously!
   useEffect(() => {
@@ -181,10 +173,6 @@ export const ApisVaultPage: React.FC<ApisVaultPageProps> = ({
   }, [isLiveTelemetryActive, keys, liveStreamRate]);
 
   const handleOpenAddModal = () => {
-    if (!isPro && keys.length >= maxAllowedKeys) {
-      setIsUpgradeModalOpen(true);
-      return;
-    }
     setFormError(null);
     setKeyInput("");
     setKeyNickname("");
@@ -198,11 +186,6 @@ export const ApisVaultPage: React.FC<ApisVaultPageProps> = ({
       return;
     }
 
-    if (!isPro && keys.length >= maxAllowedKeys) {
-      setIsAddModalOpen(false);
-      setIsUpgradeModalOpen(true);
-      return;
-    }
 
     setIsEncrypting(true);
     setFormError(null);
@@ -320,7 +303,7 @@ export const ApisVaultPage: React.FC<ApisVaultPageProps> = ({
               variant={keys.length >= 2 ? "secondary" : "cyan"}
               className="text-xs font-mono"
             >
-              {keys.length}/2 APIs Used
+              {keys.length} APIs Connected
             </Badge>
           </div>
           <p className="mt-2 text-sm text-zinc-400 max-w-2xl">
@@ -452,7 +435,7 @@ export const ApisVaultPage: React.FC<ApisVaultPageProps> = ({
               Active Keys Monitored
             </div>
             <div className="text-2xl sm:text-3xl font-extrabold font-mono text-white">
-              {keys.length} <span className="text-sm text-zinc-500 font-normal">/ {maxAllowedKeys >= 999999 ? "∞" : maxAllowedKeys} keys</span>
+              {keys.length} <span className="text-sm text-zinc-500 font-normal">/ unlimited keys</span>
             </div>
             <div className="text-[10px] font-mono text-cyan-400 mt-1">
               AES-256-GCM Secure
@@ -700,71 +683,6 @@ export const ApisVaultPage: React.FC<ApisVaultPageProps> = ({
         </div>
       )}
 
-      {/* UPGRADE MODAL (TRIGGERED ON 3RD KEY) */}
-      {isUpgradeModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="relative w-full max-w-md rounded-2xl border border-cyan-500/40 bg-zinc-950 p-6 shadow-2xl text-center">
-            <button
-              onClick={() => setIsUpgradeModalOpen(false)}
-              className="absolute top-4 right-4 text-zinc-400 hover:text-white"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center mx-auto text-cyan-400 mb-4">
-              <Zap className="w-6 h-6" />
-            </div>
-
-            <Badge variant="cyan" className="mb-2">Free Limit Reached (2/2 Keys)</Badge>
-            <h3 className="text-xl font-bold font-mono text-white">
-              Upgrade to DevCost Pro
-            </h3>
-            <p className="text-xs text-zinc-400 mt-2 leading-relaxed font-mono">
-              Free accounts can store up to <strong>2 API keys</strong>. To add 3 or more keys and track unlimited AI models, choose a Pro plan.
-            </p>
-
-            <div className="my-5 p-4 rounded-xl bg-zinc-900/90 border border-zinc-800 text-left space-y-2 text-xs font-mono">
-              <div className="flex items-center gap-2 text-zinc-200">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span><strong>Unlimited API Keys</strong> (OpenAI, Claude, Gemini, DeepSeek, etc.)</span>
-              </div>
-              <div className="flex items-center gap-2 text-zinc-200">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Continuous Live Electricity Meter telemetry</span>
-              </div>
-              <div className="flex items-center gap-2 text-zinc-200">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Real-time cheaper AI alternative suggester</span>
-              </div>
-              <div className="flex items-center gap-2 text-zinc-200">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Runaway loop circuit breaker</span>
-              </div>
-            </div>
-
-            <div className="space-y-2 font-mono">
-              <Button
-                onClick={() => {
-                  setIsUpgradeModalOpen(false);
-                  if (onNavigateToPricing) {
-                    onNavigateToPricing();
-                  }
-                }}
-                className="w-full text-xs font-mono bg-gradient-to-r from-cyan-400 to-emerald-400 hover:opacity-90 text-zinc-950 font-bold shadow-lg shadow-cyan-500/30 cursor-pointer"
-              >
-                <span>Upgrade to Pro — Plans from $15/mo →</span>
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => setIsUpgradeModalOpen(false)}
-                className="w-full text-xs font-mono text-zinc-400 hover:text-white"
-              >
-                Stay on Free (2 Keys)
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

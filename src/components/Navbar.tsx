@@ -56,14 +56,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     phoneNumber?: string;
     email?: string;
     fullName?: string;
-  } | null>(() => {
-    try {
-      const raw = localStorage.getItem("devcost_auth_user");
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
-  });
+  } | null>(null);
 
   // Sync authenticated state to cache
   useEffect(() => {
@@ -92,14 +85,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   }, [user, userId]);
 
   // Robust determination of logged-in status
-  const isAuthed = Boolean(
-    userSignedIn ||
-    authSignedIn ||
-    Boolean(user) ||
-    Boolean(userId) ||
-    Boolean(sessionId) ||
-    Boolean(cachedUser?.id || cachedUser?.phoneNumber || cachedUser?.email)
-  );
+  const isAuthed = Boolean(userLoaded && authLoaded && (userSignedIn || authSignedIn));
 
   const displayPhone =
     user?.primaryPhoneNumber?.phoneNumber ||
@@ -211,7 +197,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               <Gem className="w-3.5 h-3.5 text-amber-400" />
-              <span>Premium Plans</span>
+              <span>Support the Project</span>
             </button>
 
             {/* Admin-only Controls */}
@@ -374,7 +360,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => handleNavClick("plans")}
             className="block w-full text-left py-2 text-amber-400 hover:text-amber-300 font-semibold"
           >
-            💎 Premium Plans
+            💎 Support the Project
           </button>
           {isAdmin && (
             <button

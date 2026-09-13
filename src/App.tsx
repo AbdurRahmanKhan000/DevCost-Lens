@@ -17,7 +17,7 @@ import { SignupPage } from "./components/SignupPage";
 import { ApisVaultPage } from "./components/ApisVaultPage";
 import { TokenCounterPage } from "./components/TokenCounterPage";
 import { DashboardPage } from "./components/DashboardPage";
-import { PricingPlansPage } from "./components/PricingPlansPage";
+import { DonationPage } from "./components/DonationPage";
 import { AdminPanelPage } from "./components/AdminPanelPage";
 import { PhaseRoadmapModal } from "./components/PhaseRoadmapModal";
 import { ActiveView, ThemeMode } from "./types";
@@ -37,8 +37,8 @@ export default function App() {
 
       if (path === "/admin" || hash === "admin") {
         setCurrentView("admin");
-      } else if (path === "/pricing" || hash === "pricing" || hash === "plans") {
-        setCurrentView("plans");
+      } else if (path === "/pricing" || path === "/donate" || hash === "pricing" || hash === "plans" || hash === "donate") {
+        setCurrentView("donation");
       } else if (path === "/apis" || hash === "apis") {
         setCurrentView("apis");
       } else if (path === "/dashboard" || hash === "dashboard") {
@@ -91,7 +91,7 @@ export default function App() {
             <HeroSection
               onGetStarted={() => setCurrentView("apis")}
               onPromptCheck={() => setCurrentView("token-counter")}
-              onExplorePricing={() => setCurrentView("plans")}
+              onExplorePricing={() => setCurrentView("donation")}
             />
             <ModelPricingGrid />
             <FeaturesSection />
@@ -111,7 +111,7 @@ export default function App() {
           <ApisVaultPage
             onNavigateToDashboard={() => setCurrentView("dashboard")}
             onNavigateToTokenCounter={() => setCurrentView("token-counter")}
-            onNavigateToPricing={() => setCurrentView("plans")}
+            onNavigateToPricing={() => setCurrentView("donation")}
           />
         )}
 
@@ -121,17 +121,14 @@ export default function App() {
           />
         )}
 
-        {currentView === "plans" && (
-          <PricingPlansPage
-            onNavigateToVault={() => setCurrentView("apis")}
-            onNavigateToDashboard={() => setCurrentView("dashboard")}
-          />
+        {currentView === "donation" && (
+          <DonationPage onContinue={() => setCurrentView("apis")} />
         )}
 
         {currentView === "admin" && (
           <AdminPanelPage
             onBackToDashboard={() => setCurrentView("dashboard")}
-            onNavigateToPricing={() => setCurrentView("plans")}
+            onNavigateToPricing={() => setCurrentView("donation")}
           />
         )}
 
