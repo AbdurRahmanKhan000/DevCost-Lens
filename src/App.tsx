@@ -13,7 +13,6 @@ const FeaturesSection = lazy(() => import("./components/FeaturesSection").then((
 const AuthorSection = lazy(() => import("./components/AuthorSection").then((module) => ({ default: module.AuthorSection })));
 const ModelPricingGrid = lazy(() => import("./components/ModelPricingGrid").then((module) => ({ default: module.ModelPricingGrid })));
 const LoginPage = lazy(() => import("./components/LoginPage").then((module) => ({ default: module.LoginPage })));
-const SignupPage = lazy(() => import("./components/SignupPage").then((module) => ({ default: module.SignupPage })));
 const ApisVaultPage = lazy(() => import("./components/ApisVaultPage").then((module) => ({ default: module.ApisVaultPage })));
 const TokenCounterPage = lazy(() => import("./components/TokenCounterPage").then((module) => ({ default: module.TokenCounterPage })));
 const DashboardPage = lazy(() => import("./components/DashboardPage").then((module) => ({ default: module.DashboardPage })));
@@ -126,12 +125,6 @@ export default function App() {
           />
         )}
 
-        {currentView === "signup" && (
-          <SignupPage
-            onSwitchToLogin={() => setCurrentView("login")}
-            onBackToHome={() => setCurrentView("landing")}
-          />
-        )}
         </Suspense>
       </main>
 
