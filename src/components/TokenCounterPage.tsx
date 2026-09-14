@@ -19,7 +19,7 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { estimateTokens } from "../lib/tiktoken-util";
-import { AI_MODELS_CATALOG } from "../lib/ai-providers";
+import { AI_MODELS_CATALOG, calculateModelCost } from "../lib/ai-providers";
 import { analyzePromptAndRecommendAI } from "../lib/ai-recommender";
 import { addUsageRecord } from "../lib/supabase";
 import { formatCurrency, formatNumber } from "../lib/utils";
@@ -78,9 +78,9 @@ export const TokenCounterPage: React.FC<TokenCounterPageProps> = ({
   // Pricing comparison across all models
   const modelComparisons = useMemo(() => {
     return AI_MODELS_CATALOG.map((model) => {
+      const totalCost = calculateModelCost(model, tokenStats.estimatedTokens, expectedOutputTokens);
       const inputCost = (tokenStats.estimatedTokens / 1_000_000) * model.inputCostPer1M;
-      const outputCost = (expectedOutputTokens / 1_000_000) * model.outputCostPer1M;
-      const totalCost = inputCost + outputCost;
+      const outputCost = totalCost - inputCost;
 
       return {
         model,

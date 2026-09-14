@@ -15,8 +15,8 @@ export default defineConfig(() => {
       // The preview proxy does not expose Vite's WebSocket upgrade endpoint.
       // Keep HMR off so @vite/client cannot open a socket that immediately closes.
       hmr: false,
-      // Avoid file-watcher churn in the hosted preview; edits still trigger server restarts.
-      watch: null,
+      // Keep the file watcher enabled so preview rebuilds after edits without HMR.
+      watch: {},
     },
   };
 });

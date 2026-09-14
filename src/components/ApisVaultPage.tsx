@@ -123,11 +123,6 @@ export const ApisVaultPage: React.FC<ApisVaultPageProps> = ({
   const [isEncrypting, setIsEncrypting] = useState<boolean>(false);
   const [formError, setFormError] = useState<string | null>(null);
 
-  // Continuous Live Stream Telemetry State
-  const [isLiveTelemetryActive, setIsLiveTelemetryActive] = useState<boolean>(true);
-  const [liveStreamRate, setLiveStreamRate] = useState<number>(35); // tokens per second
-  const [liveTokensConsumed, setLiveTokensConsumed] = useState<number>(148200);
-  const [liveCostConsumed, setLiveCostConsumed] = useState<number>(0.4912);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Load existing keys and subscription
@@ -137,40 +132,8 @@ export const ApisVaultPage: React.FC<ApisVaultPageProps> = ({
 
   }, [user]);
 
-
-  // Continuous live simulation ticker: keeps ticking tokens and cost continuously!
-  useEffect(() => {
-    if (!isLiveTelemetryActive || keys.length === 0) return;
-
-    const interval = setInterval(() => {
-      // Calculate token increment based on connected keys
-      const tokenTick = Math.floor(Math.random() * 25 + liveStreamRate);
-      const activeProvider = keys[Math.floor(Math.random() * keys.length)];
-      const providerMeta = SUPPORTED_PROVIDERS.find((p) => p.id === activeProvider.provider);
-      const rate = providerMeta ? providerMeta.ratePer1MTokens : 3.0;
-      const costTick = (tokenTick / 1_000_000) * rate;
-
-      setLiveTokensConsumed((prev) => prev + tokenTick);
-      setLiveCostConsumed((prev) => prev + costTick);
-
-      // Also dynamically increment the active key's spend & tokens
-      setKeys((prevKeys) =>
-        prevKeys.map((k) => {
-          if (k.id === activeProvider.id) {
-            const updatedSpend = (k.totalSpendUSD || 0) + costTick;
-            return {
-              ...k,
-              totalSpendUSD: Number(updatedSpend.toFixed(4)),
-              lastUsedAt: new Date().toISOString(),
-            };
-          }
-          return k;
-        })
-      );
-    }, 1500);
-
-    return () => clearInterval(interval);
-  }, [isLiveTelemetryActive, keys, liveStreamRate]);
+  const trackedTokens = keys.reduce((sum, key) => sum + (key.tokensUsed || 0), 0);
+  const trackedCost = keys.reduce((sum, key) => sum + (key.totalSpendUSD || 0), 0);
 
   const handleOpenAddModal = () => {
     setFormError(null);
@@ -350,9 +313,9 @@ export const ApisVaultPage: React.FC<ApisVaultPageProps> = ({
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-zinc-800">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className={`w-2.5 h-2.5 rounded-full ${isLiveTelemetryActive ? "bg-emerald-400 animate-ping" : "bg-zinc-600"}`} />
+              <span className={`w-2.5 h-2.5 rounded-full ${keys.length > 0 ? "bg-emerald-400" : "bg-zinc-600"}`} />
               <span className="text-xs font-mono font-bold text-emerald-400 uppercase tracking-wider">
-                {isLiveTelemetryActive ? "Continuous Telemetry Active" : "Telemetry Paused"}
+                {keys.length > 0 ? "Usage tracking ready" : "No API keys connected"}
               </span>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">
                 AES-GCM Secure
@@ -368,24 +331,7 @@ export const ApisVaultPage: React.FC<ApisVaultPageProps> = ({
 
           {/* Stream Controls */}
           <div className="flex items-center gap-2 font-mono text-xs">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsLiveTelemetryActive(!isLiveTelemetryActive)}
-              className="h-8 border-zinc-800 text-zinc-300 hover:text-white"
-            >
-              {isLiveTelemetryActive ? (
-                <>
-                  <Pause className="w-3.5 h-3.5 mr-1 text-amber-400" />
-                  <span>Pause Telemetry</span>
-                </>
-              ) : (
-                <>
-                  <Play className="w-3.5 h-3.5 mr-1 text-emerald-400" />
-                  <span>Resume Telemetry</span>
-                </>
-              )}
-            </Button>
+
           </div>
         </div>
 
@@ -393,14 +339,14 @@ export const ApisVaultPage: React.FC<ApisVaultPageProps> = ({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6">
           <div className="p-4 rounded-xl bg-zinc-950/70 border border-zinc-800/80">
             <div className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-1">
-              Tokens Consumed (Live)
+              Tokens Tracked
             </div>
             <div className="text-2xl sm:text-3xl font-extrabold font-mono text-cyan-400 flex items-baseline gap-1">
-              <span>{formatNumber(liveTokensConsumed)}</span>
+              <span>{formatNumber(trackedTokens)}</span>
             </div>
             <div className="text-[10px] font-mono text-emerald-400 mt-1 flex items-center gap-1">
               <TrendingUp className="w-3 h-3" />
-              <span>Continuous monitoring active</span>
+              <span>From examined provider usage</span>
             </div>
           </div>
 
@@ -409,10 +355,10 @@ export const ApisVaultPage: React.FC<ApisVaultPageProps> = ({
               Session Cost Burn
             </div>
             <div className="text-2xl sm:text-3xl font-extrabold font-mono text-emerald-400 flex items-baseline gap-1">
-              <span>${liveCostConsumed.toFixed(4)}</span>
+              <span>${trackedCost.toFixed(4)}</span>
             </div>
             <div className="text-[10px] font-mono text-zinc-400 mt-1">
-              Real-time LiteLLM rate estimation
+              Recorded provider spend
             </div>
           </div>
 

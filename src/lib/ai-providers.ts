@@ -397,3 +397,19 @@ export const PROVIDER_METAS: Record<string, ProviderMeta> = {
 export function getModelById(id: string): AIModelPrice | undefined {
   return AI_MODELS_CATALOG.find((m) => m.id === id);
 }
+
+export function calculateModelCost(
+  model: AIModelPrice,
+  inputTokens: number,
+  outputTokens: number,
+  cachedInputTokens = 0,
+): number {
+  const safeInput = Math.max(0, inputTokens);
+  const safeOutput = Math.max(0, outputTokens);
+  const safeCached = Math.min(safeInput, Math.max(0, cachedInputTokens));
+  const regularInput = safeInput - safeCached;
+  const inputCost = (regularInput / 1_000_000) * model.inputCostPer1M;
+  const cachedCost = (safeCached / 1_000_000) * (model.cachedInputCostPer1M ?? model.inputCostPer1M);
+  const outputCost = (safeOutput / 1_000_000) * model.outputCostPer1M;
+  return Number((inputCost + cachedCost + outputCost).toFixed(8));
+}

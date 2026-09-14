@@ -2,49 +2,17 @@ import React, { useState, useEffect } from "react";
 import { Button } from "./ui/Button";
 import { Badge } from "./ui/Badge";
 import { ElectricityMeterWidget } from "./ElectricityMeterWidget";
-import { ArrowRight, ShieldCheck, Zap, Sparkles, Terminal, Layers, UserPlus, Phone, Mail } from "lucide-react";
-import { useUser, useAuth, SignUpButton } from "@clerk/react";
+import { ShieldCheck, Zap, Sparkles, Layers } from "lucide-react";
 
 interface HeroSectionProps {
-  onGetStarted: () => void;
   onPromptCheck: () => void;
   onExplorePricing: () => void;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
-  onGetStarted,
   onPromptCheck,
   onExplorePricing,
 }) => {
-  const { user, isSignedIn: userSignedIn } = useUser();
-  const { isSignedIn: authSignedIn, userId } = useAuth();
-
-  const [cachedUser, setCachedUser] = useState<{
-    phoneNumber?: string;
-    email?: string;
-  } | null>(() => {
-    try {
-      const raw = localStorage.getItem("devcost_auth_user");
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
-  });
-
-  const isAuthed = Boolean(
-    userSignedIn ||
-    authSignedIn ||
-    Boolean(user) ||
-    Boolean(userId) ||
-    Boolean(cachedUser?.phoneNumber || cachedUser?.email)
-  );
-
-  const displayIdentifier =
-    user?.primaryPhoneNumber?.phoneNumber ||
-    user?.phoneNumbers?.[0]?.phoneNumber ||
-    cachedUser?.phoneNumber ||
-    user?.primaryEmailAddress?.emailAddress ||
-    cachedUser?.email;
   return (
     <section className="relative pt-12 pb-20 md:pt-20 md:pb-28 overflow-hidden">
       {/* Background Ambient Radial Gradients */}
@@ -79,30 +47,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
           {/* Call-To-Action Group */}
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-            {!isAuthed ? (
-              <SignUpButton mode="modal">
-                <Button
-                  size="lg"
-                  className="w-full sm:w-auto text-base px-8 h-12 shadow-lg shadow-cyan-500/25 cursor-pointer font-mono"
-                >
-                  <UserPlus className="w-4 h-4 mr-2" />
-                  <span>Get Started Free with Clerk</span>
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </SignUpButton>
-            ) : (
-              <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-                <Button
-                  size="lg"
-                  onClick={onGetStarted}
-                  className="w-full sm:w-auto text-base px-8 h-12 shadow-lg shadow-cyan-500/25 cursor-pointer font-mono bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-zinc-950 font-bold"
-                >
-                  <span>Open API Vault & Live Telemetry</span>
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </div>
-            )}
-
             <Button
               variant="outline"
               size="lg"

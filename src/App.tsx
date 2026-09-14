@@ -20,13 +20,12 @@ const DashboardPage = lazy(() => import("./components/DashboardPage").then((modu
 const DonationPage = lazy(() => import("./components/DonationPage").then((module) => ({ default: module.DonationPage })));
 const AdminPanelPage = lazy(() => import("./components/AdminPanelPage").then((module) => ({ default: module.AdminPanelPage })));
 
-import { ActiveView, ThemeMode } from "./types";
+import { ActiveView } from "./types";
 import { useUser } from "@clerk/react";
 import { isUserAdmin } from "./lib/admin";
 
 export default function App() {
   const [currentView, setCurrentView] = useState<ActiveView>("landing");
-  const [theme, setTheme] = useState<ThemeMode>("dark");
   const { user } = useUser();
   const isAdmin = isUserAdmin(user);
 
@@ -65,30 +64,12 @@ export default function App() {
     }
   }, [currentView, isAdmin]);
 
-  // Sync dark class on html tag
-  useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-      root.classList.remove("light");
-    } else {
-      root.classList.remove("dark");
-      root.classList.add("light");
-    }
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100 selection:bg-cyan-500/20 selection:text-cyan-300">
       {/* Global Navbar */}
       <Navbar
         currentView={currentView}
         setCurrentView={setCurrentView}
-        theme={theme}
-        toggleTheme={toggleTheme}
       />
 
       {/* Main Content Area based on Active View */}
@@ -97,8 +78,7 @@ export default function App() {
         {currentView === "landing" && (
           <>
             <HeroSection
-              onGetStarted={() => setCurrentView("apis")}
-              onPromptCheck={() => setCurrentView("token-counter")}
+                onPromptCheck={() => setCurrentView("token-counter")}
               onExplorePricing={() => setCurrentView("donation")}
             />
             <ModelPricingGrid />
