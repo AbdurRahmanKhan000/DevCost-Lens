@@ -141,7 +141,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       });
     }
     return data;
-  }, [projection.dailyAverage, budget]);
+  }, [logs, projection.dailyAverage, thisMonthSpend, budget]);
 
   // Spend breakdown by provider for BarChart
   const providerSpendBreakdown = useMemo(() => {

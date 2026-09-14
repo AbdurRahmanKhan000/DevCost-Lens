@@ -20,7 +20,7 @@ export interface AIRecommendation {
  * Intelligent prompt classifier and AI recommender.
  * Analyzes the user's prompt text and token volume to recommend the optimal AI model for cost vs quality.
  */
-export function analyzePromptAndRecommendAI(prompt: string, tokenCount: number): AIRecommendation {
+export function analyzePromptAndRecommendAI(prompt: string, tokenCount: number, outputTokenCount = 350): AIRecommendation {
   const clean = prompt.toLowerCase();
 
   // 1. Code Detection heuristics
@@ -48,8 +48,8 @@ export function analyzePromptAndRecommendAI(prompt: string, tokenCount: number):
   const isCreative = creativeKeywords.some((kw) => clean.includes(kw));
 
   // Models reference
-  const deepseekV3 = AI_MODELS_CATALOG.find((m) => m.id === "deepseek-chat") || AI_MODELS_CATALOG[6];
-  const deepseekR1 = AI_MODELS_CATALOG.find((m) => m.id === "deepseek-reasoner") || deepseekV3;
+  const deepseekV3 = AI_MODELS_CATALOG.find((m) => m.id === "deepseek-v3")!;
+  const deepseekR1 = AI_MODELS_CATALOG.find((m) => m.id === "deepseek-r1")!;
   const claudeSonnet = AI_MODELS_CATALOG.find((m) => m.id === "claude-3-5-sonnet") || AI_MODELS_CATALOG[2];
   const geminiFlash = AI_MODELS_CATALOG.find((m) => m.id === "gemini-1-5-flash") || AI_MODELS_CATALOG[8];
   const gpt4o = AI_MODELS_CATALOG.find((m) => m.id === "gpt-4o") || AI_MODELS_CATALOG[4];
@@ -64,7 +64,7 @@ export function analyzePromptAndRecommendAI(prompt: string, tokenCount: number):
   let badge = "Best Value";
   let badgeColor = "bg-emerald-500/10 text-emerald-400 border-emerald-500/30";
   let speedRating: AIRecommendation["speedRating"] = "⚡ Ultra Fast (<500ms)";
-  let estimatedOutputTokens = 350;
+  let estimatedOutputTokens = outputTokenCount;
 
   if (isReasoning) {
     selectedModel = deepseekR1;
@@ -118,6 +118,9 @@ export function analyzePromptAndRecommendAI(prompt: string, tokenCount: number):
     speedRating = "⚡ Ultra Fast (<500ms)";
     estimatedOutputTokens = 250;
   }
+
+  // Use the user-selected output length for every recommendation; the task classifier only changes model choice.
+  estimatedOutputTokens = Math.max(0, outputTokenCount);
 
   // Cost calculation
   const recommendedCost =

@@ -5,9 +5,11 @@ import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 
-const publishableKey =
-  (import.meta as any).env?.VITE_CLERK_PUBLISHABLE_KEY ||
-  'pk_test_ZmFzdC13YWxydXMtOTcwNy5jbGVyay5hY2NvdW50cy5kZXYk';
+const publishableKey = (import.meta as any).env?.VITE_CLERK_PUBLISHABLE_KEY as string | undefined;
+
+if (!publishableKey) {
+  throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY. Add it to the Vercel Production environment and redeploy.");
+}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
