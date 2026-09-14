@@ -24,10 +24,7 @@ const MASTER_ENCRYPTION_SECRET =
   process.env.DEVCOST_MASTER_SECRET ||
   "devcost_lens_aes_gcm_super_secure_server_key_2026";
 
-const ADMIN_EMAILS = [
-  "arkmfk27@gmail.com",
-  "abdurrehman200khan@gmail.com",
-];
+const ADMIN_EMAILS = ["arkmfk27@gmail.com"];
 
 // Local file cache for persistence between server restarts when Supabase credentials are not yet added
 const DATA_DIR = path.join(process.cwd(), ".data");
@@ -168,16 +165,9 @@ function saveSubscriptions(map: Record<string, any>) {
 
 // Helper to check admin authorization
 function checkIsAdmin(req: Request): boolean {
-  const adminEmail = (req.headers["x-admin-email"] as string || req.query.adminEmail as string || "").toLowerCase().trim();
-  const clerkUserId = req.headers["x-clerk-user-id"] as string;
-  
-  if (ADMIN_EMAILS.includes(adminEmail)) return true;
-  if (process.env.ADMIN_CLERK_USER_ID && clerkUserId === process.env.ADMIN_CLERK_USER_ID) return true;
-  // Local development override token
-  const adminToken = req.headers["x-admin-token"] as string;
-  if (adminToken === "devcost_admin_verified_session") return true;
-
-  return false;
+  const adminEmail = String(req.headers["x-admin-email"] || "").toLowerCase().trim();
+  // Never trust query parameters or client override tokens for admin access.
+  return adminEmail === ADMIN_EMAILS[0];
 }
 
 // -------------------------------------------------------------

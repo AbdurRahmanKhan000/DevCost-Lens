@@ -80,7 +80,7 @@ export const AdminPanelPage: React.FC<AdminPanelPageProps> = ({
   const [manualPlan, setManualPlan] = useState("pro_annual");
   const [isUpgradingManual, setIsUpgradingManual] = useState(false);
 
-  const adminEmail = user?.primaryEmailAddress?.emailAddress || "arkmfk27@gmail.com";
+  const adminEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase().trim() || "";
 
   // Load existing encrypted settings and queue
   useEffect(() => {
@@ -213,12 +213,10 @@ export const AdminPanelPage: React.FC<AdminPanelPageProps> = ({
             Your current account does not have administrator privileges to view or configure AES-GCM payment keys.
           </p>
 
-          <div className="mt-6 p-4 rounded-xl bg-zinc-950 border border-zinc-800 text-left font-mono text-xs text-zinc-300 space-y-1">
-            <div className="text-zinc-500 text-[11px] uppercase">Authorized Admin Accounts:</div>
-            {ADMIN_EMAILS.map((email) => (
-              <div key={email} className="text-cyan-400 font-bold">• {email}</div>
-            ))}
-          </div>
+            <div className="mt-6 p-4 rounded-xl bg-zinc-950 border border-zinc-800 text-left font-mono text-xs text-zinc-300">
+              <div className="text-zinc-500 text-[11px] uppercase">Founder access</div>
+              <div className="text-cyan-400 font-bold mt-1">Only the verified founder account may continue.</div>
+            </div>
 
             <div className="mt-6 flex justify-center">
               <Button variant="outline" onClick={onBackToDashboard} className="font-mono text-xs">
@@ -411,7 +409,7 @@ export const AdminPanelPage: React.FC<AdminPanelPageProps> = ({
                       <label className="text-zinc-300 font-semibold flex items-center gap-1.5">
                         <span>Card Number / IBAN (Space for Admin)</span>
                         <span className="text-[10px] font-normal px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-500/40 text-cyan-300">
-                          Admin Only: arkmfk27 & abdurrehman200khan
+                          Admin Only: arkmfk27@gmail.com
                         </span>
                       </label>
                       <button

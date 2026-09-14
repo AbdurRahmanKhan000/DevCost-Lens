@@ -446,7 +446,6 @@ export async function getAdminPaymentSettings(adminEmail: string) {
   const res = await fetch("/api/admin/payment-settings", {
     headers: {
       "x-admin-email": adminEmail,
-      "x-admin-token": "devcost_admin_verified_session",
     },
   });
   if (!res.ok) {
@@ -462,7 +461,6 @@ export async function saveAdminPaymentSettings(data: any, adminEmail: string) {
     headers: {
       "Content-Type": "application/json",
       "x-admin-email": adminEmail,
-      "x-admin-token": "devcost_admin_verified_session",
     },
     body: JSON.stringify(data),
   });
@@ -477,7 +475,6 @@ export async function getAdminVerifications(adminEmail: string) {
   const res = await fetch("/api/admin/verifications", {
     headers: {
       "x-admin-email": adminEmail,
-      "x-admin-token": "devcost_admin_verified_session",
     },
   });
   if (!res.ok) {
@@ -498,7 +495,6 @@ export async function processVerificationAction(
     headers: {
       "Content-Type": "application/json",
       "x-admin-email": adminEmail,
-      "x-admin-token": "devcost_admin_verified_session",
     },
     body: JSON.stringify({ action, rejectionReason }),
   });
@@ -520,7 +516,6 @@ export async function adminDirectUpgradeUser(
     headers: {
       "Content-Type": "application/json",
       "x-admin-email": adminEmail,
-      "x-admin-token": "devcost_admin_verified_session",
     },
     body: JSON.stringify({ targetEmail, targetClerkId, planId }),
   });

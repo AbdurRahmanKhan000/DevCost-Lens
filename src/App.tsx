@@ -11,7 +11,6 @@ import { Footer } from "./components/Footer";
 const HeroSection = lazy(() => import("./components/HeroSection").then((module) => ({ default: module.HeroSection })));
 const FeaturesSection = lazy(() => import("./components/FeaturesSection").then((module) => ({ default: module.FeaturesSection })));
 const AuthorSection = lazy(() => import("./components/AuthorSection").then((module) => ({ default: module.AuthorSection })));
-
 const ModelPricingGrid = lazy(() => import("./components/ModelPricingGrid").then((module) => ({ default: module.ModelPricingGrid })));
 const LoginPage = lazy(() => import("./components/LoginPage").then((module) => ({ default: module.LoginPage })));
 const SignupPage = lazy(() => import("./components/SignupPage").then((module) => ({ default: module.SignupPage })));
@@ -23,11 +22,13 @@ const AdminPanelPage = lazy(() => import("./components/AdminPanelPage").then((mo
 
 import { ActiveView, ThemeMode } from "./types";
 import { useUser } from "@clerk/react";
+import { isUserAdmin } from "./lib/admin";
 
 export default function App() {
   const [currentView, setCurrentView] = useState<ActiveView>("landing");
   const [theme, setTheme] = useState<ThemeMode>("dark");
   const { user } = useUser();
+  const isAdmin = isUserAdmin(user);
 
   // URL hash / pathname synchronization
   useEffect(() => {
@@ -56,6 +57,13 @@ export default function App() {
       window.removeEventListener("hashchange", handleUrlRoute);
     };
   }, []);
+
+  useEffect(() => {
+    if (currentView === "admin" && !isAdmin) {
+      setCurrentView("dashboard");
+      if (window.location.hash === "#admin") window.history.replaceState({}, "", "/#dashboard");
+    }
+  }, [currentView, isAdmin]);
 
   // Sync dark class on html tag
   useEffect(() => {
@@ -124,7 +132,7 @@ export default function App() {
           <DonationPage onContinue={() => setCurrentView("apis")} />
         )}
 
-        {currentView === "admin" && (
+        {currentView === "admin" && isAdmin && (
           <AdminPanelPage
             onBackToDashboard={() => setCurrentView("dashboard")}
             onNavigateToPricing={() => setCurrentView("donation")}

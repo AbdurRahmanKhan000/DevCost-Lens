@@ -34,7 +34,7 @@ interface NavbarProps {
   setCurrentView: (view: ActiveView) => void;
   theme: ThemeMode;
   toggleTheme: () => void;
-  onOpenSchemaModal: () => void;
+  onOpenSchemaModal?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -217,9 +217,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
 
                 <button
-                  onClick={onOpenSchemaModal}
+                  onClick={() => onOpenSchemaModal?.()}
                   className="flex items-center gap-1 px-2 py-1 rounded bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 transition-colors cursor-pointer"
-                  title="Only visible to arkmfk27@gmail.com and abdurrehman200khan@gmail.com"
+                  title="Founder-only developer handover controls"
                 >
                   <Database className="w-3 h-3 text-cyan-400" />
                   <span>Supabase & Vercel</span>
