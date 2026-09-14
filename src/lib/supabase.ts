@@ -8,155 +8,23 @@ import { StoredApiKey, UsageRecord } from "../types";
  * and secure local synced cache for preview mode and offline development.
  */
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "https://your-project.supabase.co";
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dummy";
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || import.meta.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
 export const isSupabaseConfigured = Boolean(
-  import.meta.env.VITE_SUPABASE_URL && 
-  import.meta.env.VITE_SUPABASE_ANON_KEY &&
-  !import.meta.env.VITE_SUPABASE_URL.includes("your-project")
+  supabaseUrl &&
+  supabaseAnonKey &&
+  !supabaseUrl.includes("your-project")
 );
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Storage keys for persistent local storage
 const LOCAL_KEYS_STORAGE = "devcost_lens_encrypted_keys_v1";
-const LOCAL_USAGE_STORAGE = "devcost_lens_usage_logs_v1";
+const LOCAL_USAGE_STORAGE = "devcost_lens_usage_logs_v2";
 const LOCAL_BUDGET_STORAGE = "devcost_lens_budget_v1";
 
-// Seed realistic usage logs for initial dashboard presentation if empty
-const INITIAL_USAGE_SEEDS: UsageRecord[] = [
-  {
-    id: "seed-log-1",
-    provider: "openai",
-    modelId: "gpt-4o",
-    promptTokens: 14200,
-    completionTokens: 2800,
-    totalTokens: 17000,
-    costUSD: 0.0635,
-    latencyMs: 1420,
-    requestType: "chat",
-    projectTag: "frontend-refactor",
-    loggedAt: new Date(Date.now() - 1000 * 60 * 18).toISOString(), // 18m ago
-  },
-  {
-    id: "seed-log-2",
-    provider: "anthropic",
-    modelId: "claude-3-5-sonnet",
-    promptTokens: 38400,
-    completionTokens: 6100,
-    totalTokens: 44500,
-    costUSD: 0.2067,
-    latencyMs: 2310,
-    requestType: "reasoning",
-    projectTag: "backend-auth-agent",
-    loggedAt: new Date(Date.now() - 1000 * 60 * 55).toISOString(), // 55m ago
-  },
-  {
-    id: "seed-log-3",
-    provider: "deepseek",
-    modelId: "deepseek-v3",
-    promptTokens: 82000,
-    completionTokens: 11400,
-    totalTokens: 93400,
-    costUSD: 0.0147,
-    latencyMs: 1850,
-    requestType: "completion",
-    projectTag: "code-review-bot",
-    loggedAt: new Date(Date.now() - 1000 * 60 * 140).toISOString(), // 2.3 hrs ago
-  },
-  {
-    id: "seed-log-4",
-    provider: "google",
-    modelId: "gemini-2-0-flash",
-    promptTokens: 125000,
-    completionTokens: 8900,
-    totalTokens: 133900,
-    costUSD: 0.0161,
-    latencyMs: 640,
-    requestType: "chat",
-    projectTag: "data-pipeline",
-    loggedAt: new Date(Date.now() - 1000 * 60 * 360).toISOString(), // 6 hrs ago
-  },
-  {
-    id: "seed-log-5",
-    provider: "openai",
-    modelId: "gpt-4o-mini",
-    promptTokens: 45000,
-    completionTokens: 4200,
-    totalTokens: 49200,
-    costUSD: 0.0093,
-    latencyMs: 410,
-    requestType: "chat",
-    projectTag: "test-suites",
-    loggedAt: new Date(Date.now() - 1000 * 60 * 60 * 14).toISOString(), // 14 hrs ago
-  },
-  {
-    id: "seed-log-6",
-    provider: "anthropic",
-    modelId: "claude-3-5-haiku",
-    promptTokens: 19800,
-    completionTokens: 2100,
-    totalTokens: 21900,
-    costUSD: 0.0242,
-    latencyMs: 510,
-    requestType: "chat",
-    projectTag: "doc-generator",
-    loggedAt: new Date(Date.now() - 1000 * 60 * 60 * 22).toISOString(), // 22 hrs ago
-  },
-  {
-    id: "seed-log-7",
-    provider: "meta",
-    modelId: "meta-llama-3-3-70b",
-    promptTokens: 31000,
-    completionTokens: 3500,
-    totalTokens: 34500,
-    costUSD: 0.0054,
-    latencyMs: 820,
-    requestType: "completion",
-    projectTag: "local-evals",
-    loggedAt: new Date(Date.now() - 1000 * 60 * 60 * 28).toISOString(), // Yesterday
-  },
-  {
-    id: "seed-log-8",
-    provider: "openai",
-    modelId: "openai-o1",
-    promptTokens: 18000,
-    completionTokens: 4500,
-    totalTokens: 22500,
-    costUSD: 0.5400,
-    latencyMs: 8900,
-    requestType: "reasoning",
-    projectTag: "algorithm-optimization",
-    loggedAt: new Date(Date.now() - 1000 * 60 * 60 * 36).toISOString(), // 1.5 days ago
-  },
-  {
-    id: "seed-log-9",
-    provider: "xai",
-    modelId: "grok-2",
-    promptTokens: 12000,
-    completionTokens: 1800,
-    totalTokens: 13800,
-    costUSD: 0.0420,
-    latencyMs: 1100,
-    requestType: "chat",
-    projectTag: "social-sentiment",
-    loggedAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(), // 2 days ago
-  },
-  {
-    id: "seed-log-10",
-    provider: "moonshot",
-    modelId: "kimi-moonshot-v1-128k",
-    promptTokens: 42000,
-    completionTokens: 3200,
-    totalTokens: 45200,
-    costUSD: 0.0759,
-    latencyMs: 1900,
-    requestType: "chat",
-    projectTag: "long-pdf-analysis",
-    loggedAt: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(), // 3 days ago
-  },
-];
+const INITIAL_USAGE_SEEDS: UsageRecord[] = [];
 
 // Load stored keys
 export function getStoredApiKeys(): StoredApiKey[] {

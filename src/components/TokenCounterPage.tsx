@@ -72,8 +72,8 @@ export const TokenCounterPage: React.FC<TokenCounterPageProps> = ({
 
   // Intelligent AI Recommender based on prompt content & token volume
   const recommendation = useMemo(() => {
-    return analyzePromptAndRecommendAI(promptText, tokenStats.estimatedTokens);
-  }, [promptText, tokenStats.estimatedTokens]);
+    return analyzePromptAndRecommendAI(promptText, tokenStats.estimatedTokens, expectedOutputTokens);
+  }, [promptText, tokenStats.estimatedTokens, expectedOutputTokens]);
 
   // Pricing comparison across all models
   const modelComparisons = useMemo(() => {
