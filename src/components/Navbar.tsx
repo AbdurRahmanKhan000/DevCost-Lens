@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { BrandLogo } from "./BrandLogo";
 import { Button } from "./ui/Button";
-import { ThemeMode, ActiveView } from "../types";
+import { ActiveView } from "../types";
 import {
-  Sun,
-  Moon,
   Menu,
   X,
   Database,
@@ -22,7 +20,6 @@ import {
 import {
   UserButton,
   SignInButton,
-  SignUpButton,
   useUser,
   useAuth,
   useClerk,
@@ -32,16 +29,12 @@ import { isUserAdmin } from "../lib/admin";
 interface NavbarProps {
   currentView: ActiveView;
   setCurrentView: (view: ActiveView) => void;
-  theme: ThemeMode;
-  toggleTheme: () => void;
-  onOpenSchemaModal: () => void;
+  onOpenSchemaModal?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   currentView,
   setCurrentView,
-  theme,
-  toggleTheme,
   onOpenSchemaModal,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -50,7 +43,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const { isSignedIn: authSignedIn, isLoaded: authLoaded, userId, sessionId } = useAuth();
   const clerk = useClerk();
 
-  // Local storage cached session to prevent flash of Sign In/Get Started
+  // Cache the authenticated identity to prevent a sign-in status flash.
   const [cachedUser, setCachedUser] = useState<{
     id?: string;
     phoneNumber?: string;
@@ -217,9 +210,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
 
                 <button
-                  onClick={onOpenSchemaModal}
+                  onClick={() => onOpenSchemaModal?.()}
                   className="flex items-center gap-1 px-2 py-1 rounded bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 transition-colors cursor-pointer"
-                  title="Only visible to arkmfk27@gmail.com and abdurrehman200khan@gmail.com"
+                  title="Founder-only developer handover controls"
                 >
                   <Database className="w-3 h-3 text-cyan-400" />
                   <span>Supabase & Vercel</span>
@@ -230,19 +223,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Right Action Buttons */}
           <div className="hidden sm:flex items-center gap-3">
-            {/* Theme Toggle Button */}
-            <button
-              onClick={toggleTheme}
-              aria-label="Toggle Theme"
-              className="w-9 h-9 rounded-lg border border-zinc-800 bg-zinc-900/80 flex items-center justify-center text-zinc-400 hover:text-white hover:border-zinc-700 transition-colors cursor-pointer"
-            >
-              {theme === "dark" ? (
-                <Sun className="w-4 h-4 text-amber-400" />
-              ) : (
-                <Moon className="w-4 h-4 text-cyan-400" />
-              )}
-            </button>
-
             {/* Clerk Authentication Controls */}
             {!isAuthed ? (
               <>
@@ -256,15 +236,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </Button>
                 </SignInButton>
 
-                <SignUpButton mode="modal">
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className="text-xs font-mono shadow-[0_0_15px_rgba(6,182,212,0.3)] cursor-pointer"
-                  >
-                    Get Started
-                  </Button>
-                </SignUpButton>
               </>
             ) : (
               <div className="flex items-center gap-3 pl-3 border-l border-zinc-800">
@@ -315,16 +286,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Mobile Menu Button */}
           <div className="flex md:hidden items-center gap-2">
-            <button
-              onClick={toggleTheme}
-              className="w-9 h-9 rounded-lg border border-zinc-800 bg-zinc-900 flex items-center justify-center text-zinc-400"
-            >
-              {theme === "dark" ? (
-                <Sun className="w-4 h-4 text-amber-400" />
-              ) : (
-                <Moon className="w-4 h-4 text-cyan-400" />
-              )}
-            </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="w-9 h-9 rounded-lg border border-zinc-800 bg-zinc-900 flex items-center justify-center text-zinc-400 hover:text-white"
@@ -383,11 +344,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                     Sign In with Clerk
                   </Button>
                 </SignInButton>
-                <SignUpButton mode="modal">
-                  <Button variant="default" size="sm" className="w-full text-xs font-mono">
-                    Get Started with Clerk
-                  </Button>
-                </SignUpButton>
               </div>
             ) : (
               <div className="flex items-center justify-between py-2 gap-2">

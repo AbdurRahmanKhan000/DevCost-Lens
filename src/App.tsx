@@ -11,23 +11,22 @@ import { Footer } from "./components/Footer";
 const HeroSection = lazy(() => import("./components/HeroSection").then((module) => ({ default: module.HeroSection })));
 const FeaturesSection = lazy(() => import("./components/FeaturesSection").then((module) => ({ default: module.FeaturesSection })));
 const AuthorSection = lazy(() => import("./components/AuthorSection").then((module) => ({ default: module.AuthorSection })));
-
 const ModelPricingGrid = lazy(() => import("./components/ModelPricingGrid").then((module) => ({ default: module.ModelPricingGrid })));
 const LoginPage = lazy(() => import("./components/LoginPage").then((module) => ({ default: module.LoginPage })));
-const SignupPage = lazy(() => import("./components/SignupPage").then((module) => ({ default: module.SignupPage })));
 const ApisVaultPage = lazy(() => import("./components/ApisVaultPage").then((module) => ({ default: module.ApisVaultPage })));
 const TokenCounterPage = lazy(() => import("./components/TokenCounterPage").then((module) => ({ default: module.TokenCounterPage })));
 const DashboardPage = lazy(() => import("./components/DashboardPage").then((module) => ({ default: module.DashboardPage })));
 const DonationPage = lazy(() => import("./components/DonationPage").then((module) => ({ default: module.DonationPage })));
 const AdminPanelPage = lazy(() => import("./components/AdminPanelPage").then((module) => ({ default: module.AdminPanelPage })));
 
-import { ActiveView, ThemeMode } from "./types";
+import { ActiveView } from "./types";
 import { useUser } from "@clerk/react";
+import { isUserAdmin } from "./lib/admin";
 
 export default function App() {
   const [currentView, setCurrentView] = useState<ActiveView>("landing");
-  const [theme, setTheme] = useState<ThemeMode>("dark");
   const { user } = useUser();
+  const isAdmin = isUserAdmin(user);
 
   // URL hash / pathname synchronization
   useEffect(() => {
@@ -57,21 +56,12 @@ export default function App() {
     };
   }, []);
 
-  // Sync dark class on html tag
   useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-      root.classList.remove("light");
-    } else {
-      root.classList.remove("dark");
-      root.classList.add("light");
+    if (currentView === "admin" && !isAdmin) {
+      setCurrentView("dashboard");
+      if (window.location.hash === "#admin") window.history.replaceState({}, "", "/#dashboard");
     }
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  };
+  }, [currentView, isAdmin]);
 
   return (
     <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100 selection:bg-cyan-500/20 selection:text-cyan-300">
@@ -79,8 +69,6 @@ export default function App() {
       <Navbar
         currentView={currentView}
         setCurrentView={setCurrentView}
-        theme={theme}
-        toggleTheme={toggleTheme}
       />
 
       {/* Main Content Area based on Active View */}
@@ -89,8 +77,7 @@ export default function App() {
         {currentView === "landing" && (
           <>
             <HeroSection
-              onGetStarted={() => setCurrentView("apis")}
-              onPromptCheck={() => setCurrentView("token-counter")}
+                onPromptCheck={() => setCurrentView("token-counter")}
               onExplorePricing={() => setCurrentView("donation")}
             />
             <ModelPricingGrid />
@@ -124,7 +111,7 @@ export default function App() {
           <DonationPage onContinue={() => setCurrentView("apis")} />
         )}
 
-        {currentView === "admin" && (
+        {currentView === "admin" && isAdmin && (
           <AdminPanelPage
             onBackToDashboard={() => setCurrentView("dashboard")}
             onNavigateToPricing={() => setCurrentView("donation")}
@@ -138,12 +125,6 @@ export default function App() {
           />
         )}
 
-        {currentView === "signup" && (
-          <SignupPage
-            onSwitchToLogin={() => setCurrentView("login")}
-            onBackToHome={() => setCurrentView("landing")}
-          />
-        )}
         </Suspense>
       </main>
 

@@ -21,7 +21,6 @@ import {
   Zap,
   ShieldCheck,
   AlertTriangle,
-  RefreshCw,
   Calendar,
   Layers,
   Sparkles,
@@ -33,10 +32,9 @@ import {
   Database,
   ExternalLink,
 } from "lucide-react";
-import { UsageRecord, AIProvider } from "../types";
+import { UsageRecord } from "../types";
 import {
   getUsageLogs,
-  addUsageRecord,
   getMonthlyBudget,
   setMonthlyBudget,
   getStoredApiKeys,
@@ -60,7 +58,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   const [isEditingBudget, setIsEditingBudget] = useState(false);
   const [tempBudget, setTempBudget] = useState("50.00");
   const [selectedProviderFilter, setSelectedProviderFilter] = useState<string>("all");
-  const [isSimulatingRequest, setIsSimulatingRequest] = useState(false);
   const [connectedKeysCount, setConnectedKeysCount] = useState(0);
 
   // Load data on mount
@@ -121,33 +118,27 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     const now = new Date();
     const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
     const currentDay = now.getDate();
-    const dailyRate = projection.dailyAverage || 0.85;
-
+    const dailyRate = projection.dailyAverage;
     const data = [];
     let runningActual = 0;
 
     for (let day = 1; day <= daysInMonth; day++) {
+      const daySpend = logs
+        .filter((record) => {
+          const date = new Date(record.loggedAt);
+          return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === day;
+        })
+        .reduce((sum, record) => sum + record.costUSD, 0);
+      runningActual += daySpend;
       const isPast = day <= currentDay;
+      const projected = isPast ? runningActual : thisMonthSpend + dailyRate * (day - currentDay);
 
-      if (isPast) {
-        // Approximate historical distribution with slight natural variance
-        runningActual += (dailyRate * (0.8 + ((day * 7) % 5) * 0.1));
-        data.push({
-          day: `Day ${day}`,
-          actualSpend: Number(runningActual.toFixed(2)),
-          projectedSpend: Number(runningActual.toFixed(2)),
-          budgetLimit: budget,
-        });
-      } else {
-        // Future projection forward
-        const projected = runningActual + dailyRate * (day - currentDay);
-        data.push({
-          day: `Day ${day}`,
-          actualSpend: null,
-          projectedSpend: Number(projected.toFixed(2)),
-          budgetLimit: budget,
-        });
-      }
+      data.push({
+        day: `Day ${day}`,
+        actualSpend: isPast ? Number(runningActual.toFixed(2)) : null,
+        projectedSpend: Number(projected.toFixed(2)),
+        budgetLimit: budget,
+      });
     }
     return data;
   }, [projection.dailyAverage, budget]);
@@ -189,38 +180,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     setIsEditingBudget(false);
   };
 
-  // Live Query Simulation (adds a real record and recalculates all charts instantly)
-  const handleSimulateCall = async () => {
-    setIsSimulatingRequest(true);
-
-    const randomModels = [
-      { provider: "openai" as AIProvider, modelId: "gpt-4o", promptTokens: 3200, completionTokens: 450, cost: 0.0125 },
-      { provider: "anthropic" as AIProvider, modelId: "claude-3-5-sonnet", promptTokens: 4800, completionTokens: 620, cost: 0.0237 },
-      { provider: "deepseek" as AIProvider, modelId: "deepseek-v3", promptTokens: 12000, completionTokens: 1400, cost: 0.0021 },
-      { provider: "google" as AIProvider, modelId: "gemini-2-0-flash", promptTokens: 18500, completionTokens: 900, cost: 0.0022 },
-    ];
-
-    const pick = randomModels[Math.floor(Math.random() * randomModels.length)];
-
-    setTimeout(async () => {
-      const updated = await addUsageRecord({
-        provider: pick.provider,
-        modelId: pick.modelId,
-        promptTokens: pick.promptTokens,
-        completionTokens: pick.completionTokens,
-        totalTokens: pick.promptTokens + pick.completionTokens,
-        costUSD: pick.cost,
-        latencyMs: Math.floor(Math.random() * 800) + 300,
-        requestType: "chat",
-        projectTag: "simulated-live-call",
-        loggedAt: new Date().toISOString(),
-      });
-
-      setLogs(updated);
-      setIsSimulatingRequest(false);
-    }, 600);
-  };
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       {/* Header */}
@@ -249,16 +208,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
-          <Button
-            onClick={handleSimulateCall}
-            disabled={isSimulatingRequest}
-            size="sm"
-            className="text-xs font-mono shadow-[0_0_15px_rgba(6,182,212,0.3)] cursor-pointer"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${isSimulatingRequest ? "animate-spin" : ""}`} />
-            <span>{isSimulatingRequest ? "Executing..." : "Simulate Live API Call"}</span>
-          </Button>
-
           {onNavigateToTokenCounter && (
             <Button
               onClick={onNavigateToTokenCounter}
