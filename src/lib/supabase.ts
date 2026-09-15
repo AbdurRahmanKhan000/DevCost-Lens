@@ -256,8 +256,8 @@ export function saveLocalSubscription(sub: StoredSubscription) {
 
 // Fetch payment instructions from secure backend (AES-GCM decrypted server-side)
 export async function getPaymentInstructions(
-  method: "easypaisa" | "mastercard",
-  planId: string,
+  method: "easypaisa" | "mastercard" | "card" = "card",
+  planId: string = "donation",
   region: "pakistan" | "international" = "pakistan"
 ) {
   const res = await fetch(`/api/payment/instructions?method=${method}&planId=${planId}&region=${region}`);
@@ -265,6 +265,41 @@ export async function getPaymentInstructions(
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error || "Failed to fetch payment details from secure server.");
   }
+  return res.json();
+}
+
+// Fetch card donation instructions from secure backend (Mastercard, Visa, SadaPay, NayaPay)
+export async function getDonationInstructions() {
+  const res = await fetch("/api/donation/instructions");
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || "Failed to fetch card donation details from secure server.");
+  }
+  return res.json();
+}
+
+// User submits voluntary card donation
+export async function submitDonation(payload: {
+  clerkUserId?: string;
+  userEmail?: string;
+  userName?: string;
+  amountUSD: number;
+  cardProvider?: string;
+  transactionId: string;
+  senderAccount?: string;
+  message?: string;
+}) {
+  const res = await fetch("/api/donation/submit", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || "Donation submission failed.");
+  }
+
   return res.json();
 }
 
