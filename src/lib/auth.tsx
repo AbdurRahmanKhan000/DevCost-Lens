@@ -61,6 +61,8 @@ export function notifyKeyChange(key: string | null) {
   keyChangeListeners.forEach((listener) => listener(key));
 }
 
+const DEFAULT_CLERK_PUBLISHABLE_KEY = "pk_test_ZmFzdC13YWxydXMtOTcwNy5jbGVyay5hY2NvdW50cy5kZXYk";
+
 // Initial resolution of Clerk Publishable Key
 function getInitialPublishableKey(): string | null {
   const envKey =
@@ -83,6 +85,10 @@ function getInitialPublishableKey(): string | null {
     } catch {
       // ignore
     }
+  }
+
+  if (isValidClerkPublishableKey(DEFAULT_CLERK_PUBLISHABLE_KEY)) {
+    return DEFAULT_CLERK_PUBLISHABLE_KEY;
   }
 
   return null;

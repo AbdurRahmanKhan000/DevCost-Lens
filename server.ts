@@ -188,7 +188,7 @@ app.get("/api/auth/clerk-config", (req: Request, res: Response) => {
     process.env.VITE_CLERK_PUBLISHABLE_KEY ||
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ||
     process.env.CLERK_PUBLISHABLE_KEY ||
-    "";
+    "pk_test_ZmFzdC13YWxydXMtOTcwNy5jbGVyay5hY2NvdW50cy5kZXYk";
   res.json({ publishableKey });
 });
 
