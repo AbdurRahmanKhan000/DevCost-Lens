@@ -12,7 +12,7 @@
   <a href="https://nextjs.org"><img src="https://img.shields.io/badge/Built_with-Next.js_14-black?style=for-the-badge&logo=next.js" alt="Next.js" /></a>
 </p>
 
-<p align="center">
+<p align="center"> 
   <a href="https://github.com/AbdurRahmanKhan000/DevCost-Lens">⭐ Star this repo</a> •
   <a href="#-quick-start">Quick Start</a> •
   <a href="#-why-marketers-love-it">For Marketers</a>
