@@ -13,6 +13,9 @@ export interface TokenCountEstimate {
   lines: number;
   encoding: "o200k_base" | "cl100k_base" | "gemini_tokenizer" | "llama_tokenizer";
   tokensPerWord: number;
+  characterCount: number;
+  wordCount: number;
+  lineCount: number;
 }
 
 let o200kEncoder: ReturnType<typeof getEncoding> | null = null;
@@ -54,6 +57,9 @@ export function estimateTokens(
       characters: 0,
       words: 0,
       lines: 0,
+      characterCount: 0,
+      wordCount: 0,
+      lineCount: 0,
       encoding: "o200k_base",
       tokensPerWord: 0,
     };
@@ -111,6 +117,9 @@ export function estimateTokens(
     characters,
     words,
     lines,
+    characterCount: characters,
+    wordCount: words,
+    lineCount: lines,
     encoding: encodingUsed,
     tokensPerWord: Number((tokenCount / words).toFixed(2)),
   };

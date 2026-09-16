@@ -183,6 +183,15 @@ app.get("/api/health", (req: Request, res: Response) => {
   });
 });
 
+app.get("/api/auth/clerk-config", (req: Request, res: Response) => {
+  const publishableKey =
+    process.env.VITE_CLERK_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ||
+    process.env.CLERK_PUBLISHABLE_KEY ||
+    "";
+  res.json({ publishableKey });
+});
+
 /**
  * POST /api/keys/examine
  * Continuously tests, validates, and examines an AI API key against real upstream provider endpoints:

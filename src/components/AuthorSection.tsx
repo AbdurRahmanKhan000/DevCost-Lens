@@ -91,7 +91,7 @@ export const AuthorSection: React.FC = () => {
                 </a>
 
                 <a
-                  href="https://portfolio-arkmfk.vercel.app/"
+                  href="https://github.com/AbdurRahmanKhan000"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full sm:w-auto"
@@ -102,7 +102,7 @@ export const AuthorSection: React.FC = () => {
                     className="w-full sm:w-auto gap-2 text-xs font-mono h-9"
                   >
                     <Code2 className="w-3.5 h-3.5" />
-                    <span>portfolio-arkmfk.vercel.app</span>
+                    <span>Founder Portfolio</span>
                     <ExternalLink className="w-3 h-3 ml-0.5 text-zinc-950" />
                   </Button>
                 </a>

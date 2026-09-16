@@ -27,7 +27,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           <div className="inline-flex items-center gap-2 mb-6">
             <Badge variant="cyan" className="py-1 px-3">
               <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Smart Electricity Meter for AI</span>
+              <span>Real-Time AI Token & Cost Meter</span>
             </Badge>
           </div>
 
@@ -41,8 +41,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
           {/* Sub-headline */}
           <p className="mt-6 text-lg sm:text-xl text-zinc-300 leading-relaxed font-normal">
-            Solo developers lose hundreds every month on unmonitored tokens, agent loops, and expensive reasoning calls.
-            DevCost Lens acts as a real-time smart meter for OpenAI GPT (GPT-4.5, o1, GPT-4o) and Anthropic Claude (Opus, Sonnet, Haiku).
+            Most developers only discover what their AI calls cost when the credit card invoice hits at month's end. DevCost Lens works like a live power meter for your API keys: see token burn rates as they happen, compare models side by side, and stop runaway agent loops before they drain your balance.
           </p>
 
           {/* Call-To-Action Group */}

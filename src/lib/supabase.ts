@@ -17,7 +17,10 @@ export const isSupabaseConfigured = Boolean(
   !supabaseUrl.includes("your-project")
 );
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Safely instantiate Supabase client only when valid credentials exist; otherwise use null fallback
+export const supabase = isSupabaseConfigured
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : null as any;
 
 // Storage keys for persistent local storage
 const LOCAL_KEYS_STORAGE = "devcost_lens_encrypted_keys_v1";

@@ -26,7 +26,6 @@ export const ElectricityMeterWidget: React.FC<ElectricityMeterWidgetProps> = ({
 }) => {
   const [connectedKeys, setConnectedKeys] = useState<StoredApiKey[]>([]);
   const [selectedModelId, setSelectedModelId] = useState<string>("gpt-4o");
-  const [simulatedTokens, setSimulatedTokens] = useState<number>(0);
 
   // Load connected keys on mount
   useEffect(() => {
@@ -76,9 +75,8 @@ export const ElectricityMeterWidget: React.FC<ElectricityMeterWidgetProps> = ({
     AI_MODELS_CATALOG.find((m) => m.id === selectedModelId) || availableModels[0] || AI_MODELS_CATALOG[0];
 
   // Token calculations:
-  // If real key is connected, default tokens burned is 0 unless user makes a call or simulates a test call
-  const baseTokensUsed = primaryKey?.tokensUsed || 0;
-  const totalTokens = baseTokensUsed + simulatedTokens;
+  // Real token telemetry from connected key
+  const totalTokens = primaryKey?.tokensUsed || 0;
   const inputTokens = Math.round(totalTokens * 0.7);
   const outputTokens = totalTokens - inputTokens;
 
@@ -88,14 +86,6 @@ export const ElectricityMeterWidget: React.FC<ElectricityMeterWidgetProps> = ({
   // Dial percentage (0% when idle)
   const maxDialThreshold = 2.0; // $2 USD threshold
   const dialPercentage = totalTokens === 0 ? 0 : Math.min(100, Math.round((sessionCost / maxDialThreshold) * 100));
-
-  const handleSimulateCall = () => {
-    setSimulatedTokens((prev) => prev + 1000);
-  };
-
-  const handleResetTokens = () => {
-    setSimulatedTokens(0);
-  };
 
   return (
     <div className="relative w-full max-w-xl mx-auto rounded-2xl border border-zinc-700/60 bg-zinc-950/90 shadow-[0_0_50px_rgba(6,182,212,0.12)] p-5 sm:p-6 backdrop-blur-2xl overflow-hidden">
@@ -135,7 +125,7 @@ export const ElectricityMeterWidget: React.FC<ElectricityMeterWidgetProps> = ({
             </div>
             <p className="text-xs text-zinc-400">
               {hasRealKeys
-                ? `Monitoring real quota on ${primaryKey?.keyMask || "verified key"} · Zero idle drain`
+                ? `Monitoring real quota on ${primaryKey?.lastFourChars ? `••••${primaryKey.lastFourChars}` : "verified key"} · Zero idle drain`
                 : "Connect your OpenAI, Claude, or Gemini key to activate live feed"}
             </p>
           </div>
@@ -230,28 +220,6 @@ export const ElectricityMeterWidget: React.FC<ElectricityMeterWidgetProps> = ({
               style={{ width: `${Math.max(dialPercentage === 0 ? 0 : 5, dialPercentage)}%` }}
             />
           </div>
-        </div>
-
-        {/* Interactive Test Action for Developers */}
-        <div className="mt-3 flex items-center justify-end gap-2 text-xs font-mono">
-          <button
-            onClick={handleSimulateCall}
-            className="px-2.5 py-1 rounded border border-zinc-700 bg-zinc-800/60 hover:bg-zinc-800 text-zinc-300 hover:text-white transition-colors cursor-pointer flex items-center gap-1"
-            title="Simulate a 1k token test call on this model"
-          >
-            <Play className="w-3 h-3 text-cyan-400" />
-            <span>Test Ping (+1k tok)</span>
-          </button>
-          {simulatedTokens > 0 && (
-            <button
-              onClick={handleResetTokens}
-              className="px-2 py-1 rounded border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-rose-400 transition-colors cursor-pointer flex items-center gap-1"
-              title="Reset session test tokens back to 0"
-            >
-              <RotateCcw className="w-3 h-3" />
-              <span>Reset to Idle</span>
-            </button>
-          )}
         </div>
       </div>
 

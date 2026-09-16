@@ -1,7 +1,7 @@
 import React from "react";
 import { BrandLogo } from "./BrandLogo";
 import { Badge } from "./ui/Badge";
-import { SignUp, UserButton, useUser } from "@clerk/react";
+import { SignUp, UserButton, useUser } from "../lib/auth";
 import { ShieldCheck, CheckCircle2, ExternalLink, Info } from "lucide-react";
 import { Button } from "./ui/Button";
 
@@ -47,12 +47,12 @@ export const SignupPage: React.FC<SignupPageProps> = ({
           </div>
           <h2 className="text-xl font-bold text-white mb-2">Account Active</h2>
           <p className="text-sm text-zinc-400 mb-6 font-mono">
-            Signed in as <strong>{user?.primaryEmailAddress?.emailAddress || user?.fullName}</strong> via Clerk.
+            Signed in as <strong>{user?.primaryEmailAddress?.emailAddress || user?.fullName}</strong>.
           </p>
           <div className="flex justify-center mb-6">
             <UserButton afterSignOutUrl="/" />
           </div>
-          <Button variant="default" size="md" onClick={onBackToHome} className="w-full">
+          <Button variant="default" size="default" onClick={onBackToHome} className="w-full">
             Go to DevCost Lens Overview
           </Button>
         </div>
@@ -70,7 +70,7 @@ export const SignupPage: React.FC<SignupPageProps> = ({
             </p>
             <div className="mt-2.5">
               <Badge variant="emerald" className="text-[10px] py-0.5">
-                Clerk Authentication Enabled
+                Encrypted Session
               </Badge>
             </div>
           </div>
@@ -102,35 +102,12 @@ export const SignupPage: React.FC<SignupPageProps> = ({
             </div>
           )}
 
-          {/* Official Clerk SignUp Component */}
+          {/* Official Clerk-Style SignUp Component */}
           <div className="w-full flex justify-center">
             <SignUp
               routing="hash"
-              appearance={{
-                elements: {
-                  rootBox: "w-full",
-                  card: "w-full bg-zinc-900/90 border border-zinc-800 shadow-2xl backdrop-blur-xl text-zinc-100",
-                  headerTitle: "text-white font-bold",
-                  headerSubtitle: "text-zinc-400 text-xs font-mono",
-                  socialButtonsIconButton:
-                    "bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white transition-all",
-                  socialButtonsBlockButton:
-                    "bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-white font-mono text-xs",
-                  formButtonPrimary:
-                    "bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold font-mono text-xs",
-                  footerActionLink: "text-emerald-400 hover:text-emerald-300 font-mono",
-                },
-              }}
+              onSwitchToLogin={onSwitchToLogin}
             />
-          </div>
-
-          <div className="mt-4 text-center">
-            <button
-              onClick={onSwitchToLogin}
-              className="text-xs font-mono text-zinc-400 hover:text-emerald-400 underline cursor-pointer"
-            >
-              Already have an account? Sign in with Clerk
-            </button>
           </div>
 
           <div className="mt-6 flex items-center justify-center gap-2 text-xs text-zinc-500 font-mono">

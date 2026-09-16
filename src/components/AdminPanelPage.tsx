@@ -25,7 +25,7 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
-import { useUser } from "@clerk/react";
+import { useUser } from "../lib/auth";
 import { isUserAdmin, ADMIN_EMAILS } from "../lib/admin";
 import {
   getAdminPaymentSettings,

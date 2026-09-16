@@ -6,45 +6,45 @@ export const FeaturesSection: React.FC = () => {
   const features = [
     {
       icon: <Zap className="w-5 h-5 text-cyan-400" />,
-      title: "Real-time AI Electricity Meter",
+      title: "Real-Time Electricity Dial",
       description:
-        "Visualize prompt and completion token burn rate in real time. Never let an overnight crawler or rogue agent drain your wallet.",
-      badge: "Core Feature",
+        "Watch tokens and cents tick as calls happen. If an automated script or background retry loops unexpectedly, you catch it in seconds, not next month.",
+      badge: "Observability",
     },
     {
       icon: <Cpu className="w-5 h-5 text-emerald-400" />,
-      title: "Cheaper Alternative Recommender",
+      title: "Pragmatic Model Suggester",
       description:
-        "Powered by LiteLLM catalog logic. Instantly flags where switching from Claude 3.7 to DeepSeek V3 or Gemini 2.0 Flash cuts cost by 85-92%.",
-      badge: "Save 80%+",
+        "Don't default to o1 or Claude 3.7 for tasks that Gemini 2.0 Flash or DeepSeek V3 can solve for pennies. See the exact dollar difference for your specific prompt.",
+      badge: "Save 70-90%",
     },
     {
       icon: <Lock className="w-5 h-5 text-indigo-400" />,
-      title: "Web Crypto AES-GCM Security",
+      title: "AES-GCM Key Encryption",
       description:
-        "Zero-trust security. Developer API keys are encrypted using browser-native Web Crypto API before hitting PostgreSQL/Supabase.",
+        "Your provider keys are sealed using Web Crypto AES-256-GCM right in your browser. We never store unencrypted keys anywhere.",
       badge: "Zero-Knowledge",
     },
     {
       icon: <BellRing className="w-5 h-5 text-amber-400" />,
-      title: "Automated Circuit Breaker Alerts",
+      title: "Monthly Budget Circuit Breakers",
       description:
-        "Set hard monthly spending ceilings ($25, $50, $150). Get immediate alerts at 80% threshold to prevent surprise invoices.",
-      badge: "Shock Prevention",
+        "Set your own spending ceiling. When cumulative daily burn projects you to exceed your budget, clear visual warnings keep you ahead.",
+      badge: "Spend Control",
     },
     {
       icon: <ShieldAlert className="w-5 h-5 text-rose-400" />,
-      title: "Multi-Provider Unification",
+      title: "One Unified Dashboard",
       description:
-        "Monitor ChatGPT (OpenAI), Claude (Anthropic), Gemini (Google), DeepSeek, Moonshot Kimi, and Grok in one unified dashboard.",
-      badge: "15+ Models",
+        "Instead of logging into five different provider billing consoles (OpenAI, Anthropic, Google, DeepSeek, xAI), see everything in one place.",
+      badge: "Cross-Provider",
     },
     {
       icon: <Sparkles className="w-5 h-5 text-teal-400" />,
-      title: "Built for Solo Developers",
+      title: "Free Community Project",
       description:
-        "No complex enterprise sales calls. Instant self-serve setup with encrypted client storage and lightweight serverless telemetry.",
-      badge: "Solo Dev First",
+        "No monthly tier paywalls or locked features. Built as a transparent developer utility funded entirely by voluntary community donations.",
+      badge: "100% Free",
     },
   ];
 

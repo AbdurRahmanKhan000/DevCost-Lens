@@ -2,7 +2,7 @@ import React from "react";
 import { BrandLogo } from "./BrandLogo";
 import { Github, ExternalLink, ShieldCheck, Heart } from "lucide-react";
 import { ActiveView } from "../types";
-import { useUser } from "@clerk/react";
+import { useUser } from "../lib/auth";
 import { isUserAdmin } from "../lib/admin";
 
 interface FooterProps {
@@ -103,12 +103,12 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                   <ExternalLink className="w-3 h-3 text-zinc-500" />
                 </a>
                 <a
-                  href="https://portfolio-arkmfk.vercel.app/"
+                  href="https://github.com/AbdurRahmanKhan000"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1.5 text-zinc-300 hover:text-emerald-400"
                 >
-                  <span>portfolio-arkmfk.vercel.app</span>
+                  <span>ARK Founder Portfolio</span>
                   <ExternalLink className="w-3 h-3 text-zinc-500" />
                 </a>
               </div>

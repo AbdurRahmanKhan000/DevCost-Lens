@@ -45,13 +45,11 @@ import { AI_MODELS_CATALOG, PROVIDER_METAS } from "../lib/ai-providers";
 interface DashboardPageProps {
   onNavigateToApis?: () => void;
   onNavigateToTokenCounter?: () => void;
-  onOpenSchemaModal?: () => void;
 }
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({
   onNavigateToApis,
   onNavigateToTokenCounter,
-  onOpenSchemaModal,
 }) => {
   const [logs, setLogs] = useState<UsageRecord[]>([]);
   const [budget, setBudget] = useState<number>(50.0);
@@ -316,7 +314,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </div>
           <div className="mt-3 flex items-baseline justify-between">
             <span className="text-3xl font-extrabold font-mono text-white">
-              {connectedKeysCount}/2
+              {connectedKeysCount}
             </span>
             {onNavigateToApis && (
               <button
@@ -329,7 +327,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             )}
           </div>
           <p className="mt-2 text-[11px] font-mono text-zinc-500">
-            {connectedKeysCount >= 2 ? "Free Tier limit reached" : "1 slot available"}
+            Unlimited free key storage
           </p>
         </Card>
       </div>
@@ -470,7 +468,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
           {/* Provider Filter Tabs */}
           <div className="flex items-center gap-1.5 flex-wrap font-mono text-xs">
-            {["all", "openai", "anthropic", "google", "deepseek", "meta"].map((prov) => (
+            {["all", "openai", "anthropic", "google", "deepseek", "moonshot", "xai", "meta"].map((prov) => (
               <button
                 key={prov}
                 onClick={() => setSelectedProviderFilter(prov)}

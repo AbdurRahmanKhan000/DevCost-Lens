@@ -32,7 +32,7 @@ import {
   deleteStoredApiKey,
   addUsageRecord,
 } from "../lib/supabase";
-import { useUser } from "@clerk/react";
+import { useUser } from "../lib/auth";
 import { formatCurrency, formatNumber } from "../lib/utils";
 
 interface ApisVaultPageProps {

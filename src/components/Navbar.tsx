@@ -23,19 +23,17 @@ import {
   useUser,
   useAuth,
   useClerk,
-} from "@clerk/react";
+} from "../lib/auth";
 import { isUserAdmin } from "../lib/admin";
 
 interface NavbarProps {
   currentView: ActiveView;
   setCurrentView: (view: ActiveView) => void;
-  onOpenSchemaModal?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   currentView,
   setCurrentView,
-  onOpenSchemaModal,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isInIframe, setIsInIframe] = useState(false);
@@ -82,23 +80,20 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const displayPhone =
     user?.primaryPhoneNumber?.phoneNumber ||
-    user?.phoneNumbers?.[0]?.phoneNumber ||
-    cachedUser?.phoneNumber;
+    user?.phoneNumbers?.[0]?.phoneNumber;
 
   const displayEmail =
     user?.primaryEmailAddress?.emailAddress ||
-    user?.emailAddresses?.[0]?.emailAddress ||
-    cachedUser?.email;
+    user?.emailAddresses?.[0]?.emailAddress;
 
   const displayName =
     user?.fullName ||
     user?.firstName ||
-    cachedUser?.fullName ||
-    displayPhone ||
     displayEmail ||
+    displayPhone ||
     "Developer";
 
-  const isAdmin = isUserAdmin(user || cachedUser);
+  const isAdmin = Boolean(isAuthed && user && isUserAdmin(user));
 
   useEffect(() => {
     try {
@@ -195,29 +190,18 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {/* Admin-only Controls */}
             {isAdmin && (
-              <>
-                <button
-                  onClick={() => handleNavClick("admin")}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-colors cursor-pointer ${
-                    currentView === "admin"
-                      ? "bg-cyan-500 text-zinc-950 font-bold border-cyan-400 shadow-md shadow-cyan-500/20"
-                      : "bg-cyan-950/60 border-cyan-500/40 text-cyan-300 hover:bg-cyan-900/60"
-                  }`}
-                  title="Admin Command Panel"
-                >
-                  <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Admin Panel</span>
-                </button>
-
-                <button
-                  onClick={() => onOpenSchemaModal?.()}
-                  className="flex items-center gap-1 px-2 py-1 rounded bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 transition-colors cursor-pointer"
-                  title="Founder-only developer handover controls"
-                >
-                  <Database className="w-3 h-3 text-cyan-400" />
-                  <span>Supabase & Vercel</span>
-                </button>
-              </>
+              <button
+                onClick={() => handleNavClick("admin")}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-colors cursor-pointer ${
+                  currentView === "admin"
+                    ? "bg-cyan-500 text-zinc-950 font-bold border-cyan-400 shadow-md shadow-cyan-500/20"
+                    : "bg-cyan-950/60 border-cyan-500/40 text-cyan-300 hover:bg-cyan-900/60"
+                }`}
+                title="Admin Command Panel"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Admin Panel</span>
+              </button>
             )}
           </nav>
 
@@ -325,14 +309,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
           {isAdmin && (
             <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenSchemaModal();
-              }}
-              className="flex items-center justify-between w-full text-left py-2 text-cyan-400"
+              onClick={() => handleNavClick("admin")}
+              className="flex items-center justify-between w-full text-left py-2 text-cyan-400 font-mono font-semibold"
             >
-              <span>Supabase & Vercel Guide</span>
-              <span className="text-[10px] uppercase bg-cyan-950 px-1.5 py-0.5 rounded border border-cyan-800">Admin</span>
+              <span>🛡️ Admin Command Panel</span>
+              <span className="text-[10px] uppercase bg-cyan-950 px-1.5 py-0.5 rounded border border-cyan-800">Founder</span>
             </button>
           )}
 
