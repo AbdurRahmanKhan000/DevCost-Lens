@@ -32,7 +32,6 @@
 - [Why Marketers Love It](#-why-marketers-love-it)
 - [Features](#-features-that-make-it-iconic)
 - [How It Works](#-how-it-works--30-seconds-to-save-90)
-- [Live Demo](#-live-demo)
 - [Tech Stack](#-tech-stack)
 - [Pricing](#-pricing--built-for-solo-devs)
 - [Security](#-security--we-take-this-seriously)
