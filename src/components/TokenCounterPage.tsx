@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useDeferredValue, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./ui/Card";
 import { Button } from "./ui/Button";
 import { Badge } from "./ui/Badge";
@@ -18,7 +18,7 @@ import {
   Layers,
   HelpCircle,
 } from "lucide-react";
-import { estimateTokens } from "../lib/tiktoken-util";
+import { estimateTokens, ensureTokenizersLoaded } from "../lib/tiktoken-util";
 import { AI_MODELS_CATALOG, calculateModelCost } from "../lib/ai-providers";
 import { analyzePromptAndRecommendAI } from "../lib/ai-recommender";
 import { addUsageRecord } from "../lib/supabase";
@@ -65,15 +65,38 @@ export const TokenCounterPage: React.FC<TokenCounterPageProps> = ({
   const [copiedSummary, setCopiedSummary] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Perf: the BPE encoder tables load in the background after first paint
+  // (see tiktoken-util). Until they arrive, tokenStats uses the fast
+  // heuristic estimate; once ready, this flips and the memos below re-run
+  // with exact BPE counts. No UI change — same numbers, just not blocked.
+  const [encodersReady, setEncodersReady] = useState<boolean>(false);
+  useEffect(() => {
+    let live = true;
+    ensureTokenizersLoaded()
+      .then(() => {
+        if (live) setEncodersReady(true);
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  // Perf: typing must stay instant even for long pastes. The expensive
+  // work (BPE encode + recommendation + pricing all 19 models) runs on the
+  // deferred value, so React renders each keystroke first and settles the
+  // analysis right after, instead of blocking the input on every keystroke.
+  const deferredPrompt = useDeferredValue(promptText);
+
   // Exact BPE token calculation via tiktoken
   const tokenStats = useMemo(() => {
-    return estimateTokens(promptText);
-  }, [promptText]);
+    return estimateTokens(deferredPrompt);
+  }, [deferredPrompt, encodersReady]);
 
   // Intelligent AI Recommender based on prompt content & token volume
   const recommendation = useMemo(() => {
-    return analyzePromptAndRecommendAI(promptText, tokenStats.estimatedTokens, expectedOutputTokens);
-  }, [promptText, tokenStats.estimatedTokens, expectedOutputTokens]);
+    return analyzePromptAndRecommendAI(deferredPrompt, tokenStats.estimatedTokens, expectedOutputTokens);
+  }, [deferredPrompt, tokenStats.estimatedTokens, expectedOutputTokens]);
 
   // Pricing comparison across all models
   const modelComparisons = useMemo(() => {

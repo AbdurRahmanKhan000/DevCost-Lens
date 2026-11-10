@@ -769,6 +769,11 @@ async function start() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), "dist");
+    // Perf: files under /assets/ carry content hashes in their names, so
+    // browsers/CDNs may cache them for a year; index.html stays uncached
+    // so new deploys are picked up immediately. Repeat visits to every
+    // page then skip re-downloading JS/CSS entirely.
+    app.use("/assets", express.static(path.join(distPath, "assets"), { maxAge: "1y", immutable: true }));
     app.use(express.static(distPath));
     app.get("*", (req: Request, res: Response) => {
       res.sendFile(path.join(distPath, "index.html"));

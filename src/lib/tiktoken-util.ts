@@ -4,7 +4,66 @@
  * Claude, Gemini, DeepSeek, Kimi, and Meta Llama prompts.
  */
 
-import { getEncoding } from "js-tiktoken";
+import type { Tiktoken } from "js-tiktoken/lite";
+
+// Perf: js-tiktoken's main entry bundles EVERY encoding's rank table
+// (~5.6 MB) into whoever imports it, and building an encoder parses the
+// rank table synchronously (~1s for o200k_base alone). That made the Prompt
+// page chunk huge and blocked its first paint. So the encoders are loaded
+// lazily, after first paint, from the package's per-encoding rank modules
+// (js-tiktoken/lite + js-tiktoken/ranks/*) via dynamic import(). Until they
+// arrive, estimateTokens() falls back to the heuristic below (its existing
+// fallback path) and callers re-run once ensureTokenizersLoaded() resolves.
+// Final counts are identical to before — same BPE tables, same encoder.
+let o200kEncoder: Tiktoken | null = null;
+let cl100kEncoder: Tiktoken | null = null;
+let loadPromise: Promise<void> | null = null;
+
+async function loadO200k(): Promise<void> {
+  if (o200kEncoder) return;
+  try {
+    const [{ Tiktoken }, ranksModule] = await Promise.all([
+      import("js-tiktoken/lite"),
+      import("js-tiktoken/ranks/o200k_base"),
+    ]);
+    o200kEncoder = new Tiktoken(ranksModule.default);
+  } catch (e) {
+    console.warn("Could not init o200k_base, fallback to cl100k_base", e);
+  }
+}
+
+async function loadCl100k(): Promise<void> {
+  if (cl100kEncoder) return;
+  try {
+    const [{ Tiktoken }, ranksModule] = await Promise.all([
+      import("js-tiktoken/lite"),
+      import("js-tiktoken/ranks/cl100k_base"),
+    ]);
+    cl100kEncoder = new Tiktoken(ranksModule.default);
+  } catch (e) {
+    console.warn("Could not init cl100k_base", e);
+  }
+}
+
+/**
+ * Loads the BPE encoders in the background (after first paint). Resolves
+ * once both encoders are ready (or have failed, in which case callers keep
+ * using the heuristic fallback). Safe to call repeatedly — loads only once.
+ */
+export function ensureTokenizersLoaded(): Promise<void> {
+  if (!loadPromise) {
+    loadPromise = Promise.all([loadO200k(), loadCl100k()]).then(() => {});
+  }
+  return loadPromise;
+}
+
+function getO200k() {
+  return o200kEncoder;
+}
+
+function getCl100k() {
+  return cl100kEncoder;
+}
 
 export interface TokenCountEstimate {
   estimatedTokens: number;
@@ -16,31 +75,6 @@ export interface TokenCountEstimate {
   characterCount: number;
   wordCount: number;
   lineCount: number;
-}
-
-let o200kEncoder: ReturnType<typeof getEncoding> | null = null;
-let cl100kEncoder: ReturnType<typeof getEncoding> | null = null;
-
-function getO200k() {
-  if (!o200kEncoder) {
-    try {
-      o200kEncoder = getEncoding("o200k_base");
-    } catch (e) {
-      console.warn("Could not init o200k_base, fallback to cl100k_base", e);
-    }
-  }
-  return o200kEncoder;
-}
-
-function getCl100k() {
-  if (!cl100kEncoder) {
-    try {
-      cl100kEncoder = getEncoding("cl100k_base");
-    } catch (e) {
-      console.warn("Could not init cl100k_base", e);
-    }
-  }
-  return cl100kEncoder;
 }
 
 /**
