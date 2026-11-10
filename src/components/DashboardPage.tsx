@@ -1,20 +1,8 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./ui/Card";
 import { Button } from "./ui/Button";
 import { Badge } from "./ui/Badge";
 import { Input } from "./ui/Input";
-import {
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-  ReferenceLine,
-} from "recharts";
 import {
   TrendingUp,
   DollarSign,
@@ -41,6 +29,15 @@ import {
   isSupabaseConfigured,
 } from "../lib/supabase";
 import { AI_MODELS_CATALOG, PROVIDER_METAS } from "../lib/ai-providers";
+
+// Perf: the spend chart pulls in all of recharts (~360 kB). Loading it
+// lazily keeps the Dashboard page chunk small, so the header, metric cards,
+// provider breakdown and logs render immediately and the chart follows
+// once its chunk arrives. (BarChart/Bar were imported before but never
+// used, so they are gone with the old static recharts import.)
+const SpendChart = lazy(() =>
+  import("./SpendChart").then((module) => ({ default: module.SpendChart }))
+);
 
 interface DashboardPageProps {
   onNavigateToApis?: () => void;
@@ -363,59 +360,17 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             )}
           </div>
 
-          <div className="mt-6 h-72 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={burnRateChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="actualGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#06b6d4" stopOpacity={0.0} />
-                  </linearGradient>
-                  <linearGradient id="projectedGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
-                <XAxis dataKey="day" stroke="#71717a" fontSize={10} tickLine={false} />
-                <YAxis stroke="#71717a" fontSize={10} tickLine={false} tickFormatter={(val) => `$${val}`} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#18181b",
-                    borderColor: "#3f3f46",
-                    borderRadius: "0.75rem",
-                    fontSize: "12px",
-                    fontFamily: "monospace",
-                  }}
-                />
-                <ReferenceLine
-                  y={budget}
-                  stroke="#f43f5e"
-                  strokeDasharray="4 4"
-                  label={{ value: `Limit $${budget}`, fill: "#f43f5e", fontSize: 10, position: "top" }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="actualSpend"
-                  name="Actual Spend"
-                  stroke="#06b6d4"
-                  strokeWidth={2}
-                  fillOpacity={1}
-                  fill="url(#actualGradient)"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="projectedSpend"
-                  name="Projected Spend"
-                  stroke="#8b5cf6"
-                  strokeDasharray="4 4"
-                  strokeWidth={2}
-                  fillOpacity={1}
-                  fill="url(#projectedGradient)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
+          {/* Same-size placeholder while the chart chunk loads — no layout shift. */}
+          <Suspense
+            fallback={
+              <div
+                className="mt-6 h-72 w-full rounded-xl bg-zinc-900/40 border border-zinc-800/60 animate-pulse"
+                aria-hidden="true"
+              />
+            }
+          >
+            <SpendChart data={burnRateChartData} budget={budget} />
+          </Suspense>
         </Card>
 
         {/* Provider Spend Breakdown (4 cols) */}
